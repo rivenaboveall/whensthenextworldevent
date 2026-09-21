@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>when's the next world event?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="bg-backdrop" class="bg-backdrop" aria-hidden="true">
+    <div id="bg-image" class="bg-image"></div>
+    <div id="bg-disaster-wrapper" class="bg-disaster-wrapper">
+      <div id="bg-image-disaster" class="bg-image bg-image-disaster"></div>
+    </div>
+    <div id="bg-slash-line" class="bg-slash-line"></div>
+    <div class="bg-overlay"></div>
+  </div>
+
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <button id="disasters-toggle" class="nav-btn disasters-btn" type="button"
+        aria-label="Toggle Disasters Visibility">
+        <span id="disasters-toggle-label">Etrean Luminant Disasters: Shown</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="center-container">
+    <div id="events-grid" class="events-grid">
+      <section class="event-column world-event-column">
+        <div class="event-preview-container">
+          <div class="preview-item">
+            <span class="preview-prefix">Past Event:</span>
+            <span id="past-event-name" class="event-gradient-text"></span>
+          </div>
+        </div>
+
+        <div class="current-event-container">
+          <h1 id="current-event-name" class="current-event-title event-gradient-text"></h1>
+          <h2 id="join-status" class="join-status-heading">Time Left to join: --</h2>
+        </div>
+      </section>
+
+      <section id="disaster-section" class="event-column disaster-column">
+        <div class="event-preview-container">
+          <div class="preview-item">
+            <span class="preview-prefix">Past Disaster:</span>
+            <span id="past-disaster-name" class="event-gradient-text"></span>
+          </div>
+        </div>
+
+        <div class="current-event-container">
+          <h1 id="current-disaster-name" class="current-event-title event-gradient-text"></h1>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="bottom-timers-container">
+    <div id="bottom-timers-grid" class="bottom-timers-grid">
+      <div class="timer-column world-timer-column">
+        <div class="timer-block">
+          <div id="main-timer" class="next-event-timer-label">Next Event in --</div>
+          <div class="next-event-preview">
+            <span class="preview-prefix">Next Event:</span>
+            <span id="next-event-name" class="event-gradient-text"></span>
+          </div>
+        </div>
+      </div>
+      <div id="disaster-timer-column" class="timer-column disaster-timer-column">
+        <div id="disaster-timer-block" class="timer-block">
+          <div id="disaster-timer" class="next-event-timer-label">Next Disaster in --</div>
+          <div class="next-event-preview">
+            <span class="preview-prefix">Next Disaster:</span>
+            <span id="next-disaster-name" class="event-gradient-text"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
