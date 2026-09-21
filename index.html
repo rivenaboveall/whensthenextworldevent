@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="src/components/default.css">
+  <link rel="stylesheet" href="src/components/mobile.css" media="(max-width: 960px)">
 </head>
 
 <body>
@@ -27,6 +28,10 @@
         aria-label="Toggle Disasters Visibility">
         <span id="disasters-toggle-label">Etrean Luminant Disasters: Shown</span>
       </button>
+      <button id="mute-toggle" class="nav-btn mute-btn" type="button"
+        aria-label="Toggle Audio Mute">
+        <span id="mute-toggle-label">Mute</span>
+      </button>
     </div>
   </header>
 
@@ -44,6 +49,10 @@
           <h1 id="current-event-name" class="current-event-title event-gradient-text"></h1>
           <h2 id="join-status" class="join-status-heading">Time Left to join: --</h2>
         </div>
+
+        <div class="mobile-timer-container">
+          <div id="main-mobile-timer" class="mobile-timer"></div>
+        </div>
       </section>
 
       <section id="disaster-section" class="event-column disaster-column">
@@ -56,6 +65,10 @@
 
         <div class="current-event-container">
           <h1 id="current-disaster-name" class="current-event-title event-gradient-text"></h1>
+        </div>
+
+        <div class="mobile-timer-container">
+          <div id="disaster-mobile-timer" class="mobile-timer"></div>
         </div>
       </section>
     </div>
@@ -84,7 +97,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="src/main.js"></script>
 </body>
 
 </html>
