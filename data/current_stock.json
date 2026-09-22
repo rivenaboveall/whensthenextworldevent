@@ -2,31 +2,43 @@
   "shop_type": "stock",
   "items": [
     {
+      "name": "Ignition Union Uniform",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    },
+    {
+      "name": "Night Axe",
+      "price": 5000,
+      "currency": "Notes",
+      "category": "Weapons"
+    },
+    {
+      "name": "Gale Stone",
+      "price": 100,
+      "currency": "Notes",
+      "category": "Miscellaneous"
+    },
+    {
+      "name": "Frigid Prism",
+      "price": 100,
+      "currency": "Notes",
+      "category": "Miscellaneous"
+    },
+    {
+      "name": "Cloak of Winds",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Expert Outfit"
+    },
+    {
       "name": "Diver Journeyman Robes",
       "price": 80,
       "currency": "Notes",
       "category": "Expert Outfit"
     },
     {
-      "name": "Hive Drone",
-      "price": 80,
-      "currency": "Notes",
-      "category": "Expert Outfit"
-    },
-    {
       "name": "Authority Peacekeeper Armor",
-      "price": 80,
-      "currency": "Notes",
-      "category": "Adept Outfit"
-    },
-    {
-      "name": "Diver Apprentice Robes",
-      "price": 80,
-      "currency": "Notes",
-      "category": "Adept Outfit"
-    },
-    {
-      "name": "Keeper",
       "price": 80,
       "currency": "Notes",
       "category": "Adept Outfit"
