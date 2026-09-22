@@ -2,40 +2,40 @@
   "shop_type": "stock",
   "items": [
     {
+      "name": "Ignition Union Uniform",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    },
+    {
+      "name": "Carefree Garments",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    },
+    {
+      "name": "Hive Tactician Armor",
+      "price": 200,
+      "currency": "Notes",
+      "category": "Expert Outfit"
+    },
+    {
+      "name": "Vigil Longsword",
+      "price": 300,
+      "currency": "Notes",
+      "category": "Medium Weapon"
+    },
+    {
       "name": "Cloak of Winds",
       "price": 80,
       "currency": "Notes",
       "category": "Expert Outfit"
     },
     {
-      "name": "Moon Lip Ring",
-      "price": 35,
-      "currency": "Notes",
-      "category": "Equipment"
-    },
-    {
-      "name": "Flame Worshipper Armor",
+      "name": "Hired Mercenary",
       "price": 80,
       "currency": "Notes",
-      "category": "Adept Outfit"
-    },
-    {
-      "name": "Hive Drone",
-      "price": 80,
-      "currency": "Notes",
-      "category": "Expert Outfit"
-    },
-    {
-      "name": "Diver Apprentice Robes",
-      "price": 80,
-      "currency": "Notes",
-      "category": "Adept Outfit"
-    },
-    {
-      "name": "Serrated Warspear",
-      "price": 650,
-      "currency": "Notes",
-      "category": "Medium Weapon"
+      "category": "Starter Outfit"
     }
   ]
 }
