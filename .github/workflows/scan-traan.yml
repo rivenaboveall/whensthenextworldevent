@@ -65,8 +65,9 @@ jobs:
         run: |
           git config --global user.name "${{ steps.bot-token.outputs.app-slug }}[bot]"
           git config --global user.email "${{ steps.bot-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-          git fetch origin stock:stock || git checkout -b stock
-          git checkout stock
-          git checkout main -- data/current_stock.json
+          cp data/current_stock.json /tmp/current_stock.json
+          git fetch origin stock
+          git checkout -B stock origin/stock || git checkout -b stock
+          cp /tmp/current_stock.json data/current_stock.json
           git add data/current_stock.json
           git diff --staged --quiet || (git commit -m "AUTO: update traan stock cache" && git push origin stock)
