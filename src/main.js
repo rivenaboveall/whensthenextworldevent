@@ -1,288 +1,120 @@
-const WORLD_EVENTS = [
-	{
-		name: 'Battle Royale',
-		gradientClass: 'gradient-battle-royale',
-		textGlowClass: 'text-glow-battle-royale',
-		bgImage: 'assets/images/BattleRoyale.webp'
-	},
-	{
-		name: 'Carnival of Hearts',
-		gradientClass: 'gradient-carnival',
-		textGlowClass: 'text-glow-carnival',
-		bgImage: 'assets/images/Carnival.webp'
-	},
-	{
-		name: 'Interluminary Interloper',
-		gradientClass: 'gradient-interluminary',
-		textGlowClass: 'text-glow-interluminary',
-		bgImage: 'assets/images/Parasol.webp'
-	}
-];
+const burgerMenuBtn = document.getElementById('burger-menu-btn');
+const sideMenuDropdown = document.getElementById('side-menu-dropdown');
+const menuGroupWorldEvents = document.getElementById('menu-group-worldevents');
+const menuGroupTraan = document.getElementById('menu-group-traan');
 
-const DISASTERS = [
-	{
-		name: 'Cinders of Etris',
-		gradientClass: 'disaster-gradient-etris',
-		textGlowClass: 'text-glow-etris',
-		bgImage: 'assets/images/CindersOfEtris.webp'
-	},
-	{
-		name: 'Doom of Caeranthil',
-		gradientClass: 'disaster-gradient-caeranthil',
-		textGlowClass: 'text-glow-caeranthil',
-		bgImage: 'assets/images/Caeranthil.webp'
-	}
-];
+const menuItemRemindWe = document.getElementById('menu-item-remind-we');
+const menuRemindWeStatus = document.getElementById('menu-remind-we-status');
+const menuItemRemindTraan = document.getElementById('menu-item-remind-traan');
+const menuRemindTraanStatus = document.getElementById('menu-remind-traan-status');
+const soundtrackButtons = document.querySelectorAll('.menu-item-soundtrack');
+const soundtrackStatuses = document.querySelectorAll('.menu-soundtrack-status');
 
-const WORLD_ANCHOR_TIMESTAMP = Date.UTC(2026, 8, 20, 22, 30, 0);
-const DISASTER_ANCHOR_TIMESTAMP = Date.UTC(2026, 8, 20, 22, 0, 0);
+const layoutSwitchBtn = document.getElementById('layout-switch-btn');
+const layoutSwitchLabel = document.getElementById('layout-switch-label');
+const testEventBtn = document.getElementById('test-event-btn');
+const cursorHoverBox = document.getElementById('cursor-hover-box');
+let currentHoverTarget = null;
+let testTimeOffsetMs = 0;
 
-const WORLD_INTERVAL_MS = 30 * 60 * 1000;
-const DISASTER_INTERVAL_MS = 60 * 60 * 1000;
-const JOIN_WINDOW_MS = 5 * 60 * 1000;
+function getAppTime() {
+	return Date.now() + testTimeOffsetMs;
+}
 
-const bgBackdrop = document.getElementById('bg-backdrop');
-const bgImageElement = document.getElementById('bg-image');
-const bgImageDisasterElement = document.getElementById('bg-image-disaster');
-const disastersToggleBtn = document.getElementById('disasters-toggle');
-const disastersToggleLabel = document.getElementById('disasters-toggle-label');
-const eventsGrid = document.getElementById('events-grid');
-const disasterSection = document.getElementById('disaster-section');
-const bottomTimersGrid = document.getElementById('bottom-timers-grid');
-const disasterTimerColumn = document.getElementById('disaster-timer-column');
-const disasterTimerBlock = document.getElementById('disaster-timer-block');
+window.getAppTime = getAppTime;
 
-const pastEventNameElement = document.getElementById('past-event-name');
-const nextEventNameElement = document.getElementById('next-event-name');
-const currentEventNameElement = document.getElementById('current-event-name');
-const joinStatusElement = document.getElementById('join-status');
-const mainTimerElement = document.getElementById('main-timer');
-const mainMobileTimerElement = document.getElementById('main-mobile-timer');
+let isRemindWE = localStorage.getItem('user_remind_we') === 'true';
+window.isRemindWEEnabled = () => isRemindWE;
+let isRemindTraan = localStorage.getItem('user_remind_traan') === 'true';
+let isSoundtrackMuted = localStorage.getItem('user_soundtrack_muted') === 'true';
 
-const pastDisasterNameElement = document.getElementById('past-disaster-name');
-const nextDisasterNameElement = document.getElementById('next-disaster-name');
-const currentDisasterNameElement = document.getElementById('current-disaster-name');
-const disasterTimerElement = document.getElementById('disaster-timer');
-const disasterMobileTimerElement = document.getElementById('disaster-mobile-timer');
-
-const muteToggleBtn = document.getElementById('mute-toggle');
-const muteToggleLabel = document.getElementById('mute-toggle-label');
-
-let isMuted = localStorage.getItem('user_sound_muted') === 'true';
 const announcementAudio = new Audio('assets/sounds/Announcement.mp3');
 announcementAudio.preload = 'auto';
 
 let lastWorldSlotIndex = null;
 let lastDisasterSlotIndex = null;
+let lastTraanSlotIndex = null;
 
-let isDisastersVisible = localStorage.getItem('user_disasters_visible') !== 'false';
-let currentActiveBg = '';
-let currentActiveDisasterBg = '';
+let currentLayout = localStorage.getItem('user_active_layout') || 'worldevents';
 
-function formatCountdown(milliseconds) {
-	const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-	const minutes = Math.floor(totalSeconds / 60);
-	const seconds = totalSeconds % 60;
-	return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+function updateReminderUI() {
+	if (menuRemindWeStatus) {
+		menuRemindWeStatus.textContent = isRemindWE ? 'On' : 'Off';
+		menuRemindWeStatus.classList.toggle('status-active', isRemindWE);
+	}
+	if (menuRemindTraanStatus) {
+		menuRemindTraanStatus.textContent = isRemindTraan ? 'On' : 'Off';
+		menuRemindTraanStatus.classList.toggle('status-active', isRemindTraan);
+	}
 }
 
-function formatDurationLabel(milliseconds, what) {
-	const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-	const minutes = Math.floor(totalSeconds / 60);
-	const seconds = totalSeconds % 60;
-
-	const minuteUnit = minutes === 1 ? 'minute' : 'minutes';
-	const secondUnit = seconds === 1 ? 'second' : 'seconds';
-
-	if (what) {
-		if (minutes > 0) {
-			return `${minutes} ${minuteUnit} and ${seconds} ${secondUnit} left until next ${what}`;
-		}
-		return `${seconds} ${secondUnit} left until next ${what}`;
-	}
-
-	if (minutes > 0) {
-		return `${minutes} ${minuteUnit} and ${seconds} ${secondUnit}`;
-	}
-	return `${seconds} ${secondUnit}`;
+function updateSoundtrackUI() {
+	soundtrackStatuses.forEach((statusEl) => {
+		statusEl.textContent = isSoundtrackMuted ? 'Muted' : 'Unmuted';
+		statusEl.classList.toggle('status-muted', isSoundtrackMuted);
+		statusEl.classList.toggle('status-active', !isSoundtrackMuted);
+	});
 }
 
-function applyPreviewStyling(element, itemData) {
-	if (!element || !itemData) {
+function showDesktopNotification(title, body, icon) {
+	if (!('Notification' in window)) {
 		return;
 	}
-	element.textContent = itemData.name;
-	element.className = `event-gradient-text ${itemData.gradientClass}`;
+	if (Notification.permission === 'granted') {
+		try {
+			new Notification(title, {
+				body: body,
+				icon: icon || 'assets/images/BattleRoyale.webp'
+			});
+		} catch (e) { }
+	}
 }
 
-function updateDisastersVisibilityUI() {
-	if (isDisastersVisible) {
-		eventsGrid.classList.remove('single-column');
-		if (bottomTimersGrid)
-			bottomTimersGrid.classList.remove('single-column');
-
-		if (disasterTimerColumn)
-			disasterTimerColumn.classList.remove('timer-hidden');
-
-		if (disasterTimerBlock)
-			disasterTimerBlock.classList.remove('timer-hidden');
-
-		if (bgBackdrop)
-			bgBackdrop.classList.add('slashed');
-
-		disasterTimerElement.classList.remove('timer-hidden');
-		disastersToggleLabel.textContent = 'Hide Etrean Luminant Disasters';
-	} else {
-		eventsGrid.classList.add('single-column');
-		if (bottomTimersGrid)
-			bottomTimersGrid.classList.add('single-column');
-
-		if (disasterTimerColumn)
-			disasterTimerColumn.classList.add('timer-hidden');
-
-		if (disasterTimerBlock)
-			disasterTimerBlock.classList.add('timer-hidden');
-
-		if (bgBackdrop)
-			bgBackdrop.classList.remove('slashed');
-
-		disasterTimerElement.classList.add('timer-hidden');
-		disastersToggleLabel.textContent = 'Show Etrean Luminant Disasters';
-	}
-	disastersToggleBtn.setAttribute('aria-pressed', String(isDisastersVisible));
-	disastersToggleBtn.classList.toggle('active', isDisastersVisible);
-}
-
-function getWorldEventAtTimestamp(timestamp) {
-	const diff = timestamp - WORLD_ANCHOR_TIMESTAMP;
-	const slotIndex = Math.floor(diff / WORLD_INTERVAL_MS);
-	const eventIndex = ((slotIndex % 3) + 3) % 3;
-	const startTime = WORLD_ANCHOR_TIMESTAMP + slotIndex * WORLD_INTERVAL_MS;
-	return {
-		event: WORLD_EVENTS[eventIndex],
-		slotIndex,
-		startTime,
-		endTime: startTime + WORLD_INTERVAL_MS
-	};
-}
-
-function getDisasterAtTimestamp(timestamp) {
-	const diff = timestamp - DISASTER_ANCHOR_TIMESTAMP;
-	const slotIndex = Math.floor(diff / DISASTER_INTERVAL_MS);
-	const disasterIndex = ((slotIndex % 2) + 2) % 2;
-	const startTime = DISASTER_ANCHOR_TIMESTAMP + slotIndex * DISASTER_INTERVAL_MS;
-	return {
-		disaster: DISASTERS[disasterIndex],
-		slotIndex,
-		startTime,
-		endTime: startTime + DISASTER_INTERVAL_MS
-	};
-}
-
-function renderWorldEvents(now) {
-	const current = getWorldEventAtTimestamp(now);
-	const previous = getWorldEventAtTimestamp(current.startTime - 1);
-	const next = getWorldEventAtTimestamp(current.endTime + 1);
-
-	if (currentActiveBg !== current.event.bgImage) {
-		currentActiveBg = current.event.bgImage;
-		bgImageElement.style.backgroundImage = `url("${current.event.bgImage}")`;
-	}
-
-	currentEventNameElement.textContent = current.event.name;
-	currentEventNameElement.className = `current-event-title event-gradient-text ${current.event.gradientClass} ${current.event.textGlowClass}`;
-
-	const elapsedSinceStart = now - current.startTime;
-	const remainingJoinWindow = JOIN_WINDOW_MS - elapsedSinceStart;
-
-	if (remainingJoinWindow > 0) {
-		const formattedJoin = formatCountdown(remainingJoinWindow);
-		joinStatusElement.innerHTML = `Time Left to join: <span class="status-active-value">${formattedJoin}</span>`;
-	} else {
-		joinStatusElement.innerHTML = `You can <span class="status-no-longer">no longer</span> join this event`;
-	}
-
-	if (pastEventNameElement) {
-		applyPreviewStyling(pastEventNameElement, previous.event);
-	}
-	if (nextEventNameElement) {
-		applyPreviewStyling(nextEventNameElement, next.event);
-	}
-
-	const timeUntilNext = current.endTime - now;
-	if (mainTimerElement) {
-		mainTimerElement.textContent = formatDurationLabel(timeUntilNext, 'World Event');
-	}
-	if (mainMobileTimerElement) {
-		mainMobileTimerElement.innerHTML = `<span class="event-gradient-text ${next.event.gradientClass}">${next.event.name}</span>&nbsp;in ${formatDurationLabel(timeUntilNext)}`;
-	}
-	return current;
-}
-
-function renderDisasters(now) {
-	const current = getDisasterAtTimestamp(now);
-	const previous = getDisasterAtTimestamp(current.startTime - 1);
-	const next = getDisasterAtTimestamp(current.endTime + 1);
-
-	if (currentActiveDisasterBg !== current.disaster.bgImage) {
-		currentActiveDisasterBg = current.disaster.bgImage;
-		if (bgImageDisasterElement) {
-			bgImageDisasterElement.style.backgroundImage = `url("${current.disaster.bgImage}")`;
-		}
-	}
-
-	if (!isDisastersVisible) {
-		return current;
-	}
-
-	currentDisasterNameElement.textContent = current.disaster.name;
-	currentDisasterNameElement.className = `current-event-title event-gradient-text ${current.disaster.gradientClass} ${current.disaster.textGlowClass}`;
-
-	if (pastDisasterNameElement) {
-		applyPreviewStyling(pastDisasterNameElement, previous.disaster);
-	}
-	if (nextDisasterNameElement) {
-		applyPreviewStyling(nextDisasterNameElement, next.disaster);
-	}
-
-	const timeUntilNext = current.endTime - now;
-	if (disasterTimerElement) {
-		disasterTimerElement.textContent = formatDurationLabel(timeUntilNext, 'Disaster');
-	}
-	if (disasterMobileTimerElement) {
-		disasterMobileTimerElement.innerHTML = `<span class="event-gradient-text ${next.disaster.gradientClass}">${next.disaster.name}</span>&nbsp;in ${formatDurationLabel(timeUntilNext)}`;
-	}
-	return current;
-}
-
-function updateMuteUI() {
-	if (isMuted) {
-		muteToggleLabel.textContent = 'Unmute';
-		muteToggleBtn.setAttribute('aria-pressed', 'true');
-		muteToggleBtn.classList.add('active');
-	} else {
-		muteToggleLabel.textContent = 'Mute';
-		muteToggleBtn.setAttribute('aria-pressed', 'false');
-		muteToggleBtn.classList.remove('active');
+function requestNotificationPermission() {
+	if ('Notification' in window && Notification.permission === 'default') {
+		Notification.requestPermission();
 	}
 }
 
 function playAnnouncementSound() {
-	if (isMuted) {
-		return;
+	if (window.MusicPlayer) {
+		window.MusicPlayer.playAnnouncement();
+	} else {
+		announcementAudio.currentTime = 0;
+		announcementAudio.play().catch(() => { });
 	}
-	announcementAudio.currentTime = 0;
-	announcementAudio.play().catch(() => { });
 }
 
-function checkEventTransitions(currentWorld, currentDisaster) {
-	let shouldPlaySound = false;
+function checkEventTransitions(currentWorld, currentDisaster, currentTraan) {
+	let shouldPlayTraanSound = false;
+	let weNotification = null;
+	let traanNotification = null;
 
 	if (lastWorldSlotIndex !== null && currentWorld && currentWorld.slotIndex !== lastWorldSlotIndex) {
-		shouldPlaySound = true;
+		weNotification = {
+			title: 'World Event: ' + currentWorld.event.name,
+			body: currentWorld.event.name + ' has started!',
+			icon: currentWorld.event.bgImage
+		};
 	}
+
 	if (lastDisasterSlotIndex !== null && currentDisaster && currentDisaster.slotIndex !== lastDisasterSlotIndex) {
-		shouldPlaySound = true;
+		if (!weNotification) {
+			weNotification = {
+				title: 'Disaster: ' + currentDisaster.disaster.name,
+				body: currentDisaster.disaster.name + ' has started!',
+				icon: currentDisaster.disaster.bgImage
+			};
+		}
+	}
+
+	if (lastTraanSlotIndex !== null && currentTraan && currentTraan.slotIndex !== lastTraanSlotIndex) {
+		shouldPlayTraanSound = true;
+		traanNotification = {
+			title: "Traan Zakshun's Rotation",
+			body: "Traan Zakshun's stock has updated!",
+			icon: 'assets/images/Traan.webp'
+		};
 	}
 
 	if (currentWorld) {
@@ -291,47 +123,330 @@ function checkEventTransitions(currentWorld, currentDisaster) {
 	if (currentDisaster) {
 		lastDisasterSlotIndex = currentDisaster.slotIndex;
 	}
+	if (currentTraan) {
+		lastTraanSlotIndex = currentTraan.slotIndex;
+	}
 
-	if (shouldPlaySound) {
+	if (isRemindWE && weNotification) {
+		showDesktopNotification(weNotification.title, weNotification.body, weNotification.icon);
+	}
+
+	if (isRemindTraan && shouldPlayTraanSound) {
 		playAnnouncementSound();
+		if (traanNotification) {
+			showDesktopNotification(traanNotification.title, traanNotification.body, traanNotification.icon);
+		}
+	}
+}
+
+function updateLayoutSwitchUI() {
+	if (layoutSwitchLabel) {
+		if (currentLayout === 'worldevents') {
+			layoutSwitchLabel.textContent = "Switch to Traan Zakshun's Rotation";
+		} else {
+			layoutSwitchLabel.textContent = 'Switch to World Events';
+		}
+	}
+	if (layoutSwitchBtn) {
+		const hoverText = currentLayout === 'worldevents'
+			? "Switch to Traan's Hourly Market and Black Market Rotation, Info is fetched from the Deepwoken Info Discord Server."
+			: "Switch to World Events, Updates every half hour / Every Hour for Etrean Disasters";
+		layoutSwitchBtn.setAttribute('data-hover-text', hoverText);
+		if (currentHoverTarget === layoutSwitchBtn && cursorHoverBox) {
+			cursorHoverBox.textContent = hoverText;
+		}
+	}
+}
+
+function updateMenuGroupVisibility() {
+	if (menuGroupWorldEvents) {
+		menuGroupWorldEvents.classList.toggle('layout-hidden', currentLayout !== 'worldevents');
+	}
+	if (menuGroupTraan) {
+		menuGroupTraan.classList.toggle('layout-hidden', currentLayout !== 'traanstock');
+	}
+}
+
+let layoutTransitionTimeout = null;
+let layoutFadeInTimeout = null;
+
+function applyLayout(targetLayout) {
+	if (currentLayout === 'worldevents' && window.WorldEventsLayout) {
+		window.WorldEventsLayout.unmount();
+	} else if (currentLayout === 'traanstock' && window.TraanStockLayout) {
+		window.TraanStockLayout.unmount();
+	}
+
+	currentLayout = targetLayout;
+	localStorage.setItem('user_active_layout', currentLayout);
+
+	if (currentLayout === 'worldevents' && window.WorldEventsLayout) {
+		window.WorldEventsLayout.mount();
+	} else if (currentLayout === 'traanstock' && window.TraanStockLayout) {
+		window.TraanStockLayout.mount();
+	}
+
+	if (window.MusicPlayer) {
+		window.MusicPlayer.setLayout(currentLayout);
+	}
+
+	updateLayoutSwitchUI();
+	updateMenuGroupVisibility();
+}
+
+function switchLayout(targetLayout, isInitial = false) {
+	const curtain = document.getElementById('bg-black-curtain');
+	if (isInitial || !curtain || currentLayout === targetLayout) {
+		applyLayout(targetLayout);
+		if (curtain) {
+			curtain.classList.remove('fade-black');
+		}
+		return;
+	}
+
+	clearTimeout(layoutTransitionTimeout);
+	clearTimeout(layoutFadeInTimeout);
+
+	curtain.classList.add('fade-black');
+
+	layoutTransitionTimeout = setTimeout(() => {
+		applyLayout(targetLayout);
+
+		layoutFadeInTimeout = setTimeout(() => {
+			curtain.classList.remove('fade-black');
+		}, 50);
+	}, 600);
+}
+
+function toggleBurgerMenu() {
+	if (!sideMenuDropdown || !burgerMenuBtn) {
+		return;
+	}
+	const isCurrentlyHidden = sideMenuDropdown.classList.contains('layout-hidden');
+	sideMenuDropdown.classList.toggle('layout-hidden', !isCurrentlyHidden);
+	burgerMenuBtn.setAttribute('aria-expanded', String(isCurrentlyHidden));
+	if (!isCurrentlyHidden && cursorHoverBox && currentHoverTarget && currentHoverTarget.closest('#side-menu-dropdown')) {
+		cursorHoverBox.classList.remove('visible');
+		currentHoverTarget = null;
+	}
+}
+
+function closeBurgerMenu() {
+	if (!sideMenuDropdown || !burgerMenuBtn) {
+		return;
+	}
+	sideMenuDropdown.classList.add('layout-hidden');
+	burgerMenuBtn.setAttribute('aria-expanded', 'false');
+	if (cursorHoverBox && currentHoverTarget && currentHoverTarget.closest('#side-menu-dropdown')) {
+		cursorHoverBox.classList.remove('visible');
+		currentHoverTarget = null;
 	}
 }
 
 function render() {
-	const now = Date.now();
-	const currentWorld = renderWorldEvents(now);
-	const currentDisaster = renderDisasters(now);
-	checkEventTransitions(currentWorld, currentDisaster);
+	const now = getAppTime();
+	let worldResult = null;
+	let traanResult = null;
+
+	if (window.WorldEventsLayout) {
+		worldResult = window.WorldEventsLayout.render(now);
+	}
+
+	if (window.TraanStockLayout) {
+		traanResult = window.TraanStockLayout.render(now);
+	}
+
+	const currentWorld = worldResult ? worldResult.currentWorld : null;
+	const currentDisaster = worldResult ? worldResult.currentDisaster : null;
+	checkEventTransitions(currentWorld, currentDisaster, traanResult);
+
+	if (window.MusicPlayer) {
+		window.MusicPlayer.sync(now);
+	}
 }
 
-disastersToggleBtn.addEventListener('click', () => {
-	isDisastersVisible = !isDisastersVisible;
-	localStorage.setItem('user_disasters_visible', String(isDisastersVisible));
-	updateDisastersVisibilityUI();
-	render();
-});
-
-if (muteToggleBtn) {
-	muteToggleBtn.addEventListener('click', () => {
-		isMuted = !isMuted;
-		localStorage.setItem('user_sound_muted', String(isMuted));
-		if (isMuted) {
-			announcementAudio.pause();
-			announcementAudio.currentTime = 0;
-		}
-		updateMuteUI();
+if (burgerMenuBtn) {
+	burgerMenuBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleBurgerMenu();
 	});
 }
 
-const unlockAudio = () => {
-	announcementAudio.load();
-	document.removeEventListener('click', unlockAudio);
-	document.removeEventListener('keydown', unlockAudio);
-};
-document.addEventListener('click', unlockAudio, { once: true });
-document.addEventListener('keydown', unlockAudio, { once: true });
+document.addEventListener('click', (e) => {
+	if (sideMenuDropdown && !sideMenuDropdown.contains(e.target) && e.target !== burgerMenuBtn && !burgerMenuBtn.contains(e.target)) {
+		closeBurgerMenu();
+	}
+});
 
-updateDisastersVisibilityUI();
-updateMuteUI();
+document.addEventListener('keydown', (e) => {
+	if (e.key === 'Escape') {
+		closeBurgerMenu();
+	}
+});
+
+if (menuItemRemindWe) {
+	menuItemRemindWe.addEventListener('click', () => {
+		isRemindWE = !isRemindWE;
+		localStorage.setItem('user_remind_we', String(isRemindWE));
+		if (isRemindWE) {
+			requestNotificationPermission();
+		}
+		updateReminderUI();
+	});
+}
+
+if (menuItemRemindTraan) {
+	menuItemRemindTraan.addEventListener('click', () => {
+		isRemindTraan = !isRemindTraan;
+		localStorage.setItem('user_remind_traan', String(isRemindTraan));
+		if (isRemindTraan) {
+			requestNotificationPermission();
+		}
+		updateReminderUI();
+	});
+}
+
+soundtrackButtons.forEach((btn) => {
+	btn.addEventListener('click', () => {
+		isSoundtrackMuted = !isSoundtrackMuted;
+		localStorage.setItem('user_soundtrack_muted', String(isSoundtrackMuted));
+		updateSoundtrackUI();
+		if (window.MusicPlayer) {
+			window.MusicPlayer.setMuted(isSoundtrackMuted);
+		}
+	});
+});
+
+if (layoutSwitchBtn) {
+	layoutSwitchBtn.addEventListener('click', () => {
+		const nextLayout = currentLayout === 'worldevents' ? 'traanstock' : 'worldevents';
+		switchLayout(nextLayout);
+	});
+}
+
+const isLocalhost = window.location.hostname === 'localhost' ||
+	window.location.hostname === '127.0.0.1' ||
+	window.location.hostname === '';
+
+if (testEventBtn) {
+	if (isLocalhost) {
+		testEventBtn.classList.remove('layout-hidden');
+	} else {
+		testEventBtn.classList.add('layout-hidden');
+	}
+
+	testEventBtn.addEventListener('click', () => {
+		const now = getAppTime();
+		const currentWorld = getWorldEventAtTimestamp(now);
+		const targetNextEventTime = now + 20000;
+		testTimeOffsetMs += (currentWorld.endTime - targetNextEventTime);
+		const updatedNow = getAppTime();
+		const updatedWorld = getWorldEventAtTimestamp(updatedNow);
+		lastWorldSlotIndex = updatedWorld.slotIndex;
+		if (window.MusicPlayer) {
+			window.MusicPlayer.resetTransition();
+			window.MusicPlayer.lastWorldSlotIndex = updatedWorld.slotIndex;
+			window.MusicPlayer.sync(updatedNow, true);
+		}
+		render();
+	});
+}
+
+function updateCursorHover(e) {
+	if (!cursorHoverBox) {
+		return;
+	}
+	const target = e.target.closest('[data-hover-text]');
+	if (!target) {
+		if (currentHoverTarget) {
+			currentHoverTarget = null;
+			cursorHoverBox.classList.remove('visible');
+		}
+		return;
+	}
+
+	const menuDropdownParent = target.closest('#side-menu-dropdown');
+	if (menuDropdownParent && menuDropdownParent.classList.contains('layout-hidden')) {
+		if (currentHoverTarget) {
+			currentHoverTarget = null;
+			cursorHoverBox.classList.remove('visible');
+		}
+		return;
+	}
+
+	const text = target.getAttribute('data-hover-text');
+	if (!text) {
+		if (currentHoverTarget) {
+			currentHoverTarget = null;
+			cursorHoverBox.classList.remove('visible');
+		}
+		return;
+	}
+
+	if (currentHoverTarget !== target || cursorHoverBox.textContent !== text) {
+		currentHoverTarget = target;
+		cursorHoverBox.textContent = text;
+	}
+
+	cursorHoverBox.classList.add('visible');
+
+	const offset = 14;
+	let x = e.clientX + offset;
+	let y = e.clientY + offset;
+
+	const boxWidth = cursorHoverBox.offsetWidth || 220;
+	const boxHeight = cursorHoverBox.offsetHeight || 36;
+
+	if (x + boxWidth > window.innerWidth - 10) {
+		x = e.clientX - boxWidth - offset;
+	}
+	if (y + boxHeight > window.innerHeight - 10) {
+		y = e.clientY - boxHeight - offset;
+	}
+
+	cursorHoverBox.style.left = `${Math.max(6, x)}px`;
+	cursorHoverBox.style.top = `${Math.max(6, y)}px`;
+}
+
+function hideCursorHover() {
+	if (cursorHoverBox) {
+		cursorHoverBox.classList.remove('visible');
+		currentHoverTarget = null;
+	}
+}
+
+document.addEventListener('mousemove', updateCursorHover);
+document.addEventListener('mouseleave', hideCursorHover);
+window.addEventListener('blur', hideCursorHover);
+document.addEventListener('touchstart', hideCursorHover, { passive: true });
+
+const unlockAudio = () => {
+	if (window.MusicPlayer && window.MusicPlayer.announcementAudio) {
+		window.MusicPlayer.announcementAudio.load();
+	}
+	announcementAudio.load();
+	window.removeEventListener('pointerdown', unlockAudio, { capture: true });
+	window.removeEventListener('click', unlockAudio, { capture: true });
+	window.removeEventListener('keydown', unlockAudio, { capture: true });
+	window.removeEventListener('touchstart', unlockAudio, { capture: true });
+};
+window.addEventListener('pointerdown', unlockAudio, { capture: true, once: true });
+window.addEventListener('click', unlockAudio, { capture: true, once: true });
+window.addEventListener('keydown', unlockAudio, { capture: true, once: true });
+window.addEventListener('touchstart', unlockAudio, { capture: true, once: true, passive: true });
+
+if (window.WorldEventsLayout) {
+	window.WorldEventsLayout.init();
+}
+if (window.TraanStockLayout) {
+	window.TraanStockLayout.init();
+}
+if (window.MusicPlayer) {
+	window.MusicPlayer.init();
+}
+
+switchLayout(currentLayout, true);
+updateReminderUI();
+updateSoundtrackUI();
 render();
 setInterval(render, 500);

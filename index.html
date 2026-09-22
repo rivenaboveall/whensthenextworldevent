@@ -8,8 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/components/default.css">
-  <link rel="stylesheet" href="src/components/mobile.css" media="(max-width: 960px)">
+  <link rel="preload" as="image" href="assets/images/Traan.webp">
+  <link rel="preload" as="image" href="assets/images/BattleRoyale.webp">
+  <link rel="preload" as="image" href="assets/images/Carnival.webp">
+  <link rel="preload" as="image" href="assets/images/Parasol.webp">
+  <link rel="preload" as="image" href="assets/images/CindersOfEtris.webp">
+  <link rel="preload" as="image" href="assets/images/Caeranthil.webp">
+  <link rel="stylesheet" href="src/components/default.css?v=3">
+  <link rel="stylesheet" href="src/components/mobile.css?v=3" media="(max-width: 960px)">
 </head>
 
 <body>
@@ -20,17 +26,62 @@
     </div>
     <div id="bg-slash-line" class="bg-slash-line"></div>
     <div class="bg-overlay"></div>
+    <div id="bg-black-curtain" class="bg-black-curtain"></div>
   </div>
 
   <header class="top-bar">
     <div class="top-bar-left">
-      <button id="disasters-toggle" class="nav-btn disasters-btn" type="button"
-        aria-label="Toggle Disasters Visibility">
-        <span id="disasters-toggle-label">Etrean Luminant Disasters: Shown</span>
+      <button id="burger-menu-btn" class="nav-btn burger-btn" type="button"
+        aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="side-menu-dropdown">
+        <svg class="burger-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
       </button>
-      <button id="mute-toggle" class="nav-btn mute-btn" type="button"
-        aria-label="Toggle Audio Mute">
-        <span id="mute-toggle-label">Mute</span>
+
+      <button id="test-event-btn" class="nav-btn test-event-btn layout-hidden" type="button"
+        data-hover-text="Test transition to the next World Event (Localhost only)">
+        Test Event
+      </button>
+
+      <div id="side-menu-dropdown" class="menu-dropdown layout-hidden" role="menu">
+        <div id="menu-group-worldevents" class="menu-group">
+          <button id="menu-item-disasters" class="menu-item" type="button" role="menuitem"
+            data-hover-text="Show Disasters happening in the Etrean Luminant along with the current World Events">
+            <span class="menu-item-text">Etrean Luminant Disasters</span>
+            <span id="menu-disasters-status" class="menu-item-status status-active">Shown</span>
+          </button>
+          <button id="menu-item-remind-we" class="menu-item" type="button" role="menuitem"
+            data-hover-text="Play a sound cue and a desktop notification when the next event happens.">
+            <span class="menu-item-text">Remind Me (World Events)</span>
+            <span id="menu-remind-we-status" class="menu-item-status">Off</span>
+          </button>
+          <button id="menu-item-mute-soundtrack-we" class="menu-item menu-item-soundtrack" type="button" role="menuitem"
+            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
+            <span class="menu-item-text">Mute Soundtrack</span>
+            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
+          </button>
+        </div>
+
+        <div id="menu-group-traan" class="menu-group layout-hidden">
+          <button id="menu-item-remind-traan" class="menu-item" type="button" role="menuitem"
+            data-hover-text="Play a sound cue and a desktop notification when the next event happens.">
+            <span class="menu-item-text">Remind Me (Traan Zakshun)</span>
+            <span id="menu-remind-traan-status" class="menu-item-status">Off</span>
+          </button>
+          <button id="menu-item-mute-soundtrack-traan" class="menu-item menu-item-soundtrack" type="button" role="menuitem"
+            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
+            <span class="menu-item-text">Mute Soundtrack</span>
+            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="top-bar-right">
+      <button id="layout-switch-btn" class="nav-btn layout-switch-btn" type="button" aria-label="Switch Layout"
+        data-hover-text="Switch to Traan's Hourly Market and Black Market Rotation, Info is fetched from the Deepwoken Info Discord Server.">
+        <span id="layout-switch-label">Switch to Traan Zakshun's Rotation</span>
       </button>
     </div>
   </header>
@@ -72,9 +123,13 @@
         </div>
       </section>
     </div>
+
+    <div id="traan-stock-layout" class="traan-layout layout-hidden">
+      <h1 class="current-event-title event-gradient-text gradient-traan text-glow-traan">Work in Progress</h1>
+    </div>
   </main>
 
-  <div class="bottom-timers-container">
+  <div id="bottom-timers-container" class="bottom-timers-container">
     <div id="bottom-timers-grid" class="bottom-timers-grid">
       <div class="timer-column world-timer-column">
         <div class="timer-block">
@@ -97,7 +152,12 @@
     </div>
   </div>
 
-  <script src="src/main.js"></script>
+  <div id="cursor-hover-box" class="cursor-hover-box" aria-hidden="true"></div>
+
+  <script src="src/layouts/worldevents.js?v=4"></script>
+  <script src="src/layouts/traanstock.js?v=4"></script>
+  <script src="src/musicplayer.js?v=4"></script>
+  <script src="src/main.js?v=4"></script>
 </body>
 
 </html>

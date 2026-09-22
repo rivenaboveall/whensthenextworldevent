@@ -8,16 +8,30 @@
   }
 
   .top-bar {
-    justify-content: center;
-    padding: 0.85rem 1rem;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.65rem 0.85rem;
   }
 
   .top-bar-left {
-    width: 100%;
-    justify-content: center;
+    position: relative;
+    width: auto;
+    justify-content: flex-start;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .top-bar-right {
+    width: auto;
+    justify-content: flex-end;
+    display: flex;
+    align-items: center;
+  }
+
+  .menu-dropdown {
+    left: 0;
+    width: min(85vw, 300px);
   }
 
   .center-container {
@@ -133,5 +147,11 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.3px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  }
+
+  .traan-stub-card {
+    padding: 1.5rem 1.75rem;
+    width: 90%;
+    max-width: 360px;
   }
 }
