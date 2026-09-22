@@ -21,15 +21,33 @@ jobs:
         with:
           token: ${{ steps.bot-token.outputs.token }}
 
+      - name: Cache APT packages
+        id: cache-apt
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-tesseract-${{ runner.os }}
+
+      - name: Install APT Dependencies
+        run: |
+          if ! command -v tesseract >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --download-only tesseract-ocr libtesseract-dev
+            sudo dpkg -i -E /var/cache/apt/archives/*.deb || sudo apt-get -f install -y
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies & Tesseract
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr libtesseract-dev
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-3.11-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-3.11-
 
       - name: Install Py Dependencies
         run: |
