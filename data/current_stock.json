@@ -1,0 +1,35 @@
+{
+  "shop_type": "stock",
+  "items": [
+    {
+      "name": "Diver Journeyman Robes",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Expert Outfit"
+    },
+    {
+      "name": "Hive Drone",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Expert Outfit"
+    },
+    {
+      "name": "Authority Peacekeeper Armor",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    },
+    {
+      "name": "Diver Apprentice Robes",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    },
+    {
+      "name": "Keeper",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    }
+  ]
+}

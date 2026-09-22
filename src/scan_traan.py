@@ -120,21 +120,39 @@ def locate_shop_header(img):
 
     data = pytesseract.image_to_data(thr, config="--psm 11", output_type=pytesseract.Output.DICT)
     n = len(data["text"])
-    
+
+    stock_hits = []
+    cache_hits = []
+
     for i in range(n):
         word = data["text"][i].strip().lower()
-        if "salvaged" in word or "stock" in word:
-            hx = int(data["left"][i] / scale)
-            hy = int(data["top"][i] / scale)
-            hw = int(data["width"][i] / scale)
-            hh = int(data["height"][i] / scale)
-            return "stock", {"x": hx, "y": hy, "w": hw, "h": hh}
-        if "black" in word or "cache" in word or "market" in word:
-            hx = int(data["left"][i] / scale)
-            hy = int(data["top"][i] / scale)
-            hw = int(data["width"][i] / scale)
-            hh = int(data["height"][i] / scale)
-            return "cache", {"x": hx, "y": hy, "w": hw, "h": hh}
+        if not word:
+            continue
+        top = data["top"][i] / scale
+        if top > img.height * 0.40:
+            continue
+        l = data["left"][i] / scale
+        width = data["width"][i] / scale
+        height = data["height"][i] / scale
+
+        if any(k in word for k in ["salvaged", "stock"]):
+            stock_hits.append((l, top, width, height))
+        if any(k in word for k in ["black", "cache", "market"]):
+            cache_hits.append((l, top, width, height))
+
+    if stock_hits:
+        min_x = min(hit[0] for hit in stock_hits)
+        min_y = min(hit[1] for hit in stock_hits)
+        max_x = max(hit[0] + hit[2] for hit in stock_hits)
+        max_y = max(hit[1] + hit[3] for hit in stock_hits)
+        return "stock", {"min_x": min_x, "min_y": min_y, "max_x": max_x, "max_y": max_y}
+
+    if cache_hits:
+        min_x = min(hit[0] for hit in cache_hits)
+        min_y = min(hit[1] for hit in cache_hits)
+        max_x = max(hit[0] + hit[2] for hit in cache_hits)
+        max_y = max(hit[1] + hit[3] for hit in cache_hits)
+        return "cache", {"min_x": min_x, "min_y": min_y, "max_x": max_x, "max_y": max_y}
 
     full_str = pytesseract.image_to_string(gray, config="--psm 6").lower()
     if "black market" in full_str or "cache" in full_str:
@@ -217,18 +235,18 @@ try:
     is_traan = shop_type is not None
 
     if header_box:
-        cx1 = max(0, header_box["x"] - 60)
-        cy1 = max(0, header_box["y"] - 10)
-        cx2 = min(w, header_box["x"] + int(w * 0.70))
-        cy2 = min(h, header_box["y"] + int(h * 0.85))
+        cx1 = 0
+        cy1 = max(0, int(header_box["min_y"] - 30))
+        cx2 = min(w, int(w * 0.88))
+        cy2 = min(h, int(header_box["min_y"] + h * 0.75))
         shop_crop = img.crop((cx1, cy1, cx2, cy2))
     else:
-        shop_crop = img.crop((0, 0, int(w * 0.85), int(h * 0.90)))
+        shop_crop = img.crop((0, 0, int(w * 0.88), int(h * 0.85)))
 
     cw, ch = shop_crop.size
     mid_x = cw // 2
-    left_crop = shop_crop.crop((0, 0, min(cw, mid_x + 40), ch))
-    right_crop = shop_crop.crop((max(0, mid_x - 40), 0, cw, ch))
+    left_crop = shop_crop.crop((0, 0, min(cw, mid_x + 80), ch))
+    right_crop = shop_crop.crop((max(0, mid_x - 80), 0, cw, ch))
 
     crops_to_scan = [shop_crop, left_crop, right_crop]
 
