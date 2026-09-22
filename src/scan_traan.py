@@ -311,7 +311,3 @@ current_stock_path = os.path.join(data_dir, "current_stock.json")
 
 with open(current_stock_path, "w", encoding="utf-8") as f:
     json.dump(current_stock, f, indent=2)
-
-latest_path = os.path.join(project_root, "latest.json")
-with open(latest_path, "w", encoding="utf-8") as f:
-    json.dump(result, f, indent=2)
