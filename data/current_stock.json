@@ -1,0 +1,17 @@
+{
+  "shop_type": "stock",
+  "items": [
+    {
+      "name": "Hive Drone",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Expert Outfit"
+    },
+    {
+      "name": "Authority Peacekeeper Armor",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    }
+  ]
+}
