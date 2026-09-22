@@ -8,18 +8,25 @@ on:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
+      - name: Generate Bot Token
+        id: bot-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install  Dependencies & Tesseract
+      - name: Install Dependencies & Tesseract
         run: |
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr libtesseract-dev
@@ -28,7 +35,7 @@ jobs:
         run: |
           pip install pytesseract pillow
 
-      - name: Fetch  Discord Messages
+      - name: Fetch Discord Messages
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
@@ -36,7 +43,7 @@ jobs:
 
       - name: Commit and Push Results
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "${{ steps.bot-token.outputs.app-slug }}[bot]"
+          git config --global user.email "${{ steps.bot-token.outputs.app-slug }}[bot]@users.noreply.github.com"
           git add data/current_stock.json
           git diff --staged --quiet || (git commit -m "AUTO: update traan stock cache" && git push)
