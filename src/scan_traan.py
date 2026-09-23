@@ -10,24 +10,6 @@ import pytesseract
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
-ITEM_DATABASE = None
-gist_db_url = "https://gist.githubusercontent.com/rivenaboveall/3812620da6968788c60c51f726196443/raw/TraanAllItems.json"
-try:
-    req_db = urllib.request.Request(gist_db_url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req_db, timeout=5) as resp:
-        ITEM_DATABASE = json.loads(resp.read().decode("utf-8"))
-except Exception:
-    pass
-
-if not ITEM_DATABASE:
-    database_path = os.path.join(project_root, "data", "item_database.json")
-    if not os.path.exists(database_path):
-        database_path = os.path.join("data", "item_database.json")
-    with open(database_path, "r", encoding="utf-8") as f:
-        ITEM_DATABASE = json.load(f)
-
-if sys.platform == "win32":
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def load_env_file(filepath=".env"):
     if not os.path.exists(filepath):
@@ -47,7 +29,7 @@ load_env_file()
 
 if sys.platform == "win32":
     import winreg
-    for var_name in ["DISCORD_TOKEN", "CHANNEL_ID"]:
+    for var_name in ["DISCORD_TOKEN", "CHANNEL_ID", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"]:
         if not os.environ.get(var_name):
             try:
                 reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment")
@@ -57,6 +39,30 @@ if sys.platform == "win32":
                 winreg.CloseKey(reg_key)
             except Exception:
                 pass
+
+if sys.platform == "win32":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+upstash_url = os.environ.get("UPSTASH_REDIS_REST_URL")
+upstash_token = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+if not upstash_url or not upstash_token:
+    sys.exit("missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN")
+
+ITEM_DATABASE = None
+try:
+    req_db = urllib.request.Request(
+        f"{upstash_url}/json.get/TRAAN_ALLITEMS",
+        headers={"Authorization": f"Bearer {upstash_token}"}
+    )
+    with urllib.request.urlopen(req_db, timeout=10) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+        raw = data.get("result")
+        ITEM_DATABASE = json.loads(raw) if isinstance(raw, str) else raw
+except Exception as e:
+    sys.exit(f"Failed to fetch item database from Upstash: {e}")
+
+if not ITEM_DATABASE:
+    sys.exit("Item database is empty or unavailable.")
 
 TOKEN = os.environ.get("DISCORD_TOKEN")
 CHANNEL_ID = os.environ.get("CHANNEL_ID")
@@ -312,11 +318,23 @@ finally:
     if os.path.exists(temp_img_path):
         os.remove(temp_img_path)
 
-data_dir = os.path.join(project_root, "data")
-if not os.path.exists(data_dir):
-    data_dir = "data"
-os.makedirs(data_dir, exist_ok=True)
-current_stock_path = os.path.join(data_dir, "current_stock.json")
-
-with open(current_stock_path, "w", encoding="utf-8") as f:
-    json.dump(current_stock, f, indent=2)
+upstash_url = os.environ.get("UPSTASH_REDIS_REST_URL")
+upstash_token = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+if upstash_url and upstash_token:
+    cmd = ["JSON.SET", "TRAAN_STOCK", "$", json.dumps(current_stock)]
+    req_upstash = urllib.request.Request(
+        upstash_url,
+        data=json.dumps(cmd).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {upstash_token}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req_upstash, timeout=10) as resp:
+            print("Upstash Redis TRAAN_STOCK updated successfully.")
+    except Exception as e:
+        print(f"Failed to update Upstash Redis: {e}", file=sys.stderr)
+else:
+    print(json.dumps(current_stock, indent=2))

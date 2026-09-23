@@ -326,13 +326,16 @@ const MusicPlayer = {
             const currentTraan = typeof traanFetcher === 'function' ? traanFetcher(now) : null;
             const startTime = currentTraan ? currentTraan.startTime : now;
             const elapsedSeconds = Math.max(0, (now - startTime) / 1000);
-            const meta = TRACK_METADATA['Traan'];
+            const topicTrack = (window.TraanStockLayout && typeof window.TraanStockLayout.getAudioTrackInfo === 'function')
+                ? window.TraanStockLayout.getAudioTrackInfo()
+                : null;
+            const meta = topicTrack || TRACK_METADATA['Traan'];
             const targetTime = elapsedSeconds % meta.duration;
             return {
                 src: meta.src,
                 duration: meta.duration,
                 targetTime,
-                eventName: 'Traan',
+                eventName: meta.eventName || 'Traan',
                 variant: 1
             };
         }

@@ -35,7 +35,41 @@ let lastWorldSlotIndex = null;
 let lastDisasterSlotIndex = null;
 let lastTraanSlotIndex = null;
 
-let currentLayout = localStorage.getItem('user_active_layout') || 'worldevents';
+const redirectPath = sessionStorage.getItem('redirect_path');
+if (redirectPath) {
+	sessionStorage.removeItem('redirect_path');
+	if (window.location.pathname !== redirectPath) {
+		window.history.replaceState(null, '', redirectPath);
+	}
+}
+
+function getBasePath() {
+	const clean = window.location.pathname.replace(/\/(world-events|traan-zakshun)\/?$/, '');
+	return clean.endsWith('/') ? clean.slice(0, -1) : clean;
+}
+
+function getInitialLayout() {
+	const path = window.location.pathname.toLowerCase();
+	if (path.includes('/traan-zakshun')) {
+		return 'traanstock';
+	}
+	return 'worldevents';
+}
+
+function updateLayoutUrl(layout, replace = false) {
+	const basePath = getBasePath();
+	const targetSegment = layout === 'traanstock' ? '/traan-zakshun/' : '/world-events/';
+	const targetPath = `${basePath}${targetSegment}`;
+	if (window.location.pathname !== targetPath) {
+		if (replace) {
+			window.history.replaceState({ layout }, '', targetPath);
+		} else {
+			window.history.pushState({ layout }, '', targetPath);
+		}
+	}
+}
+
+let currentLayout = getInitialLayout();
 
 function updateReminderUI() {
 	if (menuRemindWeStatus) {
@@ -170,20 +204,24 @@ function updateMenuGroupVisibility() {
 let layoutTransitionTimeout = null;
 let layoutFadeInTimeout = null;
 
-function applyLayout(targetLayout) {
-	if (currentLayout === 'worldevents' && window.WorldEventsLayout) {
-		window.WorldEventsLayout.unmount();
-	} else if (currentLayout === 'traanstock' && window.TraanStockLayout) {
-		window.TraanStockLayout.unmount();
-	}
-
+function applyLayout(targetLayout, updateHistory = 'push') {
 	currentLayout = targetLayout;
 	localStorage.setItem('user_active_layout', currentLayout);
 
-	if (currentLayout === 'worldevents' && window.WorldEventsLayout) {
-		window.WorldEventsLayout.mount();
-	} else if (currentLayout === 'traanstock' && window.TraanStockLayout) {
-		window.TraanStockLayout.mount();
+	if (targetLayout === 'worldevents') {
+		if (window.TraanStockLayout) {
+			window.TraanStockLayout.unmount();
+		}
+		if (window.WorldEventsLayout) {
+			window.WorldEventsLayout.mount();
+		}
+	} else if (targetLayout === 'traanstock') {
+		if (window.WorldEventsLayout) {
+			window.WorldEventsLayout.unmount();
+		}
+		if (window.TraanStockLayout) {
+			window.TraanStockLayout.mount();
+		}
 	}
 
 	if (window.MusicPlayer) {
@@ -192,12 +230,18 @@ function applyLayout(targetLayout) {
 
 	updateLayoutSwitchUI();
 	updateMenuGroupVisibility();
+
+	if (updateHistory === 'push') {
+		updateLayoutUrl(currentLayout, false);
+	} else if (updateHistory === 'replace') {
+		updateLayoutUrl(currentLayout, true);
+	}
 }
 
-function switchLayout(targetLayout, isInitial = false) {
+function switchLayout(targetLayout, isInitial = false, updateHistory = 'push') {
 	const curtain = document.getElementById('bg-black-curtain');
 	if (isInitial || !curtain || currentLayout === targetLayout) {
-		applyLayout(targetLayout);
+		applyLayout(targetLayout, isInitial ? 'replace' : updateHistory);
 		if (curtain) {
 			curtain.classList.remove('fade-black');
 		}
@@ -210,13 +254,20 @@ function switchLayout(targetLayout, isInitial = false) {
 	curtain.classList.add('fade-black');
 
 	layoutTransitionTimeout = setTimeout(() => {
-		applyLayout(targetLayout);
+		applyLayout(targetLayout, updateHistory);
 
 		layoutFadeInTimeout = setTimeout(() => {
 			curtain.classList.remove('fade-black');
 		}, 50);
 	}, 600);
 }
+
+window.addEventListener('popstate', (e) => {
+	const targetLayout = (e.state && e.state.layout) || getInitialLayout();
+	if (targetLayout !== currentLayout) {
+		switchLayout(targetLayout, false, 'none');
+	}
+});
 
 function toggleBurgerMenu() {
 	if (!sideMenuDropdown || !burgerMenuBtn) {

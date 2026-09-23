@@ -4,6 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      var path = window.location.pathname;
+      var baseHref = path.startsWith('/whensthenextworldevent') ? '/whensthenextworldevent/' : '/';
+      document.write('<base href="' + baseHref + '">');
+    })();
+  </script>
   <title>when's the next world event?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -170,9 +177,9 @@
   <div id="cursor-hover-box" class="cursor-hover-box" aria-hidden="true"></div>
 
   <script src="src/layouts/worldevents.js?v=5"></script>
-  <script src="src/layouts/traanstock.js?v=7"></script>
-  <script src="src/musicplayer.js?v=6"></script>
-  <script src="src/main.js?v=5"></script>
+  <script src="src/layouts/traanstock.js?v=13"></script>
+  <script src="src/musicplayer.js?v=7"></script>
+  <script src="src/main.js?v=7"></script>
 </body>
 
 </html>

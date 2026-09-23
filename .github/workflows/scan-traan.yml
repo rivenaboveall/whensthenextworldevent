@@ -55,20 +55,10 @@ jobs:
         run: |
           pip install pytesseract pillow
 
-      - name: Fetch Discord Messages
+      - name: Fetch Discord Messages and Update Upstash
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: python3 src/scan_traan.py
-
-      - name: Push Stock to Gist
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_PAT || secrets.GIST_TOKEN }}
-        run: |
-          git clone "https://${GIST_TOKEN}@gist.github.com/8d7fd9ecd4a4b6ed9e5b101ea84af391.git" gist_stock
-          cp data/current_stock.json gist_stock/TraanCurrentStock.json
-          cd gist_stock
-          git config user.name "${{ steps.bot-token.outputs.app-slug }}[bot]"
-          git config user.email "${{ steps.bot-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-          git add TraanCurrentStock.json
-          git diff --staged --quiet || (git commit -m "AUTO: update traan stock cache" && git push origin HEAD)
