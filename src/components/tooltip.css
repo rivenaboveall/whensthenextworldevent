@@ -1,0 +1,35 @@
+.cursor-hover-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  background: rgba(14, 18, 26, 0.96);
+  border: none;
+  outline: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.45;
+  padding: 0.5rem 0.75rem;
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+  will-change: left, top;
+}
+
+.cursor-hover-box.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (hover: none) {
+  .cursor-hover-box {
+    display: none !important;
+  }
+}

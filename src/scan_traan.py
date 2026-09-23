@@ -10,12 +10,21 @@ import pytesseract
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
-database_path = os.path.join(project_root, "data", "item_database.json")
-if not os.path.exists(database_path):
-    database_path = os.path.join("data", "item_database.json")
+ITEM_DATABASE = None
+gist_db_url = "https://gist.githubusercontent.com/rivenaboveall/3812620da6968788c60c51f726196443/raw/TraanAllItems.json"
+try:
+    req_db = urllib.request.Request(gist_db_url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req_db, timeout=5) as resp:
+        ITEM_DATABASE = json.loads(resp.read().decode("utf-8"))
+except Exception:
+    pass
 
-with open(database_path, "r", encoding="utf-8") as f:
-    ITEM_DATABASE = json.load(f)
+if not ITEM_DATABASE:
+    database_path = os.path.join(project_root, "data", "item_database.json")
+    if not os.path.exists(database_path):
+        database_path = os.path.join("data", "item_database.json")
+    with open(database_path, "r", encoding="utf-8") as f:
+        ITEM_DATABASE = json.load(f)
 
 if sys.platform == "win32":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"

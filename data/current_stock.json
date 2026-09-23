@@ -2,28 +2,16 @@
   "shop_type": "stock",
   "items": [
     {
-      "name": "Ignition Union Uniform",
-      "price": 80,
-      "currency": "Notes",
-      "category": "Adept Outfit"
-    },
-    {
       "name": "Carefree Garments",
       "price": 80,
       "currency": "Notes",
       "category": "Adept Outfit"
     },
     {
-      "name": "Hive Tactician Armor",
-      "price": 200,
+      "name": "Keeper",
+      "price": 80,
       "currency": "Notes",
-      "category": "Expert Outfit"
-    },
-    {
-      "name": "Vigil Longsword",
-      "price": 300,
-      "currency": "Notes",
-      "category": "Medium Weapon"
+      "category": "Adept Outfit"
     },
     {
       "name": "Cloak of Winds",
@@ -32,10 +20,28 @@
       "category": "Expert Outfit"
     },
     {
+      "name": "Scoundrel's Saber",
+      "price": 650,
+      "currency": "Notes",
+      "category": "Medium Weapon"
+    },
+    {
+      "name": "Flame Worshipper Armor",
+      "price": 80,
+      "currency": "Notes",
+      "category": "Adept Outfit"
+    },
+    {
       "name": "Hired Mercenary",
       "price": 80,
       "currency": "Notes",
       "category": "Starter Outfit"
+    },
+    {
+      "name": "Warden Ceremonial Sword",
+      "price": 300,
+      "currency": "Notes",
+      "category": "Medium Weapon"
     }
   ]
 }

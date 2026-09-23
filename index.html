@@ -14,8 +14,14 @@
   <link rel="preload" as="image" href="assets/images/Parasol.webp">
   <link rel="preload" as="image" href="assets/images/CindersOfEtris.webp">
   <link rel="preload" as="image" href="assets/images/Caeranthil.webp">
-  <link rel="stylesheet" href="src/components/default.css?v=3">
-  <link rel="stylesheet" href="src/components/mobile.css?v=3" media="(max-width: 960px)">
+  <meta name="description" content="Live countdown tracker for Deepwoken World Events, Luminant Disasters, and Traan Zakshun's Black Market rotations.">
+  <meta name="theme-color" content="#0b0f17">
+  <link rel="icon" type="image/webp" href="assets/icons/ItemImage.webp">
+  <link rel="stylesheet" href="src/components/base.css?v=1">
+  <link rel="stylesheet" href="src/components/header.css?v=1">
+  <link rel="stylesheet" href="src/components/tooltip.css?v=1">
+  <link rel="stylesheet" href="src/components/worldevents.css?v=1">
+  <link rel="stylesheet" href="src/components/traanstock.css?v=1">
 </head>
 
 <body>
@@ -26,14 +32,15 @@
     </div>
     <div id="bg-slash-line" class="bg-slash-line"></div>
     <div class="bg-overlay"></div>
-    <div id="bg-black-curtain" class="bg-black-curtain"></div>
   </div>
+  <div id="bg-black-curtain" class="bg-black-curtain" aria-hidden="true"></div>
 
   <header class="top-bar">
     <div class="top-bar-left">
-      <button id="burger-menu-btn" class="nav-btn burger-btn" type="button"
-        aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="side-menu-dropdown">
-        <svg class="burger-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none">
+      <button id="burger-menu-btn" class="nav-btn burger-btn" type="button" aria-label="Toggle Navigation Menu"
+        aria-expanded="false" aria-controls="side-menu-dropdown">
+        <svg class="burger-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" fill="none">
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -70,7 +77,8 @@
             <span class="menu-item-text">Remind Me (Traan Zakshun)</span>
             <span id="menu-remind-traan-status" class="menu-item-status">Off</span>
           </button>
-          <button id="menu-item-mute-soundtrack-traan" class="menu-item menu-item-soundtrack" type="button" role="menuitem"
+          <button id="menu-item-mute-soundtrack-traan" class="menu-item menu-item-soundtrack" type="button"
+            role="menuitem"
             data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
             <span class="menu-item-text">Mute Soundtrack</span>
             <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
@@ -124,12 +132,19 @@
       </section>
     </div>
 
-    <div id="traan-stock-layout" class="traan-layout layout-hidden">
-      <h1 class="current-event-title event-gradient-text gradient-traan text-glow-traan">Work in Progress</h1>
-    </div>
+    <section id="traan-stock-layout" class="traan-layout layout-hidden" aria-label="Traan Zakshun Stock">
+      <div class="traan-shop-container">
+        <div class="traan-header-row">
+          <h2 id="traan-stock-title" class="traan-shop-title">Traan's Salvaged Stock</h2>
+          <div id="traan-stock-timer" class="traan-stock-timer">Next <strong>Black Market</strong> in --</div>
+        </div>
+        <div class="traan-header-divider"></div>
+        <div id="traan-stock-grid" class="traan-stock-grid"></div>
+      </div>
+    </section>
   </main>
 
-  <div id="bottom-timers-container" class="bottom-timers-container">
+  <footer id="bottom-timers-container" class="bottom-timers-container">
     <div id="bottom-timers-grid" class="bottom-timers-grid">
       <div class="timer-column world-timer-column">
         <div class="timer-block">
@@ -150,14 +165,14 @@
         </div>
       </div>
     </div>
-  </div>
+  </footer>
 
   <div id="cursor-hover-box" class="cursor-hover-box" aria-hidden="true"></div>
 
-  <script src="src/layouts/worldevents.js?v=4"></script>
-  <script src="src/layouts/traanstock.js?v=4"></script>
-  <script src="src/musicplayer.js?v=4"></script>
-  <script src="src/main.js?v=4"></script>
+  <script src="src/layouts/worldevents.js?v=5"></script>
+  <script src="src/layouts/traanstock.js?v=7"></script>
+  <script src="src/musicplayer.js?v=6"></script>
+  <script src="src/main.js?v=5"></script>
 </body>
 
 </html>

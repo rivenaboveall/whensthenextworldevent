@@ -61,13 +61,14 @@ jobs:
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
         run: python3 src/scan_traan.py
 
-      - name: Commit and Push Results
+      - name: Push Stock to Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_PAT || secrets.GIST_TOKEN }}
         run: |
-          git config --global user.name "${{ steps.bot-token.outputs.app-slug }}[bot]"
-          git config --global user.email "${{ steps.bot-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-          cp data/current_stock.json /tmp/current_stock.json
-          git fetch origin stock
-          git checkout -B stock origin/stock || git checkout -b stock
-          cp /tmp/current_stock.json data/current_stock.json
-          git add data/current_stock.json
-          git diff --staged --quiet || (git commit -m "AUTO: update traan stock cache" && git push origin stock)
+          git clone "https://${GIST_TOKEN}@gist.github.com/8d7fd9ecd4a4b6ed9e5b101ea84af391.git" gist_stock
+          cp data/current_stock.json gist_stock/TraanCurrentStock.json
+          cd gist_stock
+          git config user.name "${{ steps.bot-token.outputs.app-slug }}[bot]"
+          git config user.email "${{ steps.bot-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          git add TraanCurrentStock.json
+          git diff --staged --quiet || (git commit -m "AUTO: update traan stock cache" && git push origin HEAD)
