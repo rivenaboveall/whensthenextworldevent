@@ -76,7 +76,7 @@ const MusicPlayer = {
     announcementAudio: null,
     currentTrackSrc: '',
     isMuted: localStorage.getItem('user_soundtrack_muted') === 'true',
-    activeLayout: localStorage.getItem('user_active_layout') || 'worldevents',
+    activeLayout: (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('/traan-zakshun')) ? 'traanstock' : 'worldevents',
     hasInteracted: false,
     transitionPhase: 'normal',
     lastWorldSlotIndex: null,
@@ -119,6 +119,11 @@ const MusicPlayer = {
             }
 
             if (!this.isMuted) {
+                const inactiveAudio = this.getInactiveAudio();
+                if (inactiveAudio) {
+                    inactiveAudio.pause();
+                    inactiveAudio.volume = 0;
+                }
                 const audio = this.getActiveAudio();
                 if (audio) {
                     const now = typeof getAppTime === 'function' ? getAppTime() : Date.now();
@@ -133,6 +138,11 @@ const MusicPlayer = {
                     }
                     if (audio.paused || audio.volume < 0.05) {
                         audio.play().then(() => {
+                            if (this.getActiveAudio() !== audio) {
+                                audio.pause();
+                                audio.volume = 0;
+                                return;
+                            }
                             fadeAudio(audio, this.targetVolume, 1500);
                         }).catch(() => { });
                     }
@@ -147,6 +157,11 @@ const MusicPlayer = {
 
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && !this.isMuted) {
+                const inactiveAudio = this.getInactiveAudio();
+                if (inactiveAudio) {
+                    inactiveAudio.pause();
+                    inactiveAudio.volume = 0;
+                }
                 const now = typeof getAppTime === 'function' ? getAppTime() : Date.now();
                 const audio = this.getActiveAudio();
                 if (audio && this.transitionPhase === 'normal') {
@@ -162,6 +177,11 @@ const MusicPlayer = {
                         }
                         if (audio.paused && !this.isMuted) {
                             audio.play().then(() => {
+                                if (this.getActiveAudio() !== audio) {
+                                    audio.pause();
+                                    audio.volume = 0;
+                                    return;
+                                }
                                 this.hasInteracted = true;
                                 fadeAudio(audio, this.targetVolume, 1500);
                             }).catch(() => { });
@@ -179,6 +199,11 @@ const MusicPlayer = {
                 const playPromise = activeAudio.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
+                        if (this.getActiveAudio() !== activeAudio) {
+                            activeAudio.pause();
+                            activeAudio.volume = 0;
+                            return;
+                        }
                         this.hasInteracted = true;
                         fadeAudio(activeAudio, this.targetVolume, 1500);
                     }).catch(() => { });
@@ -189,6 +214,10 @@ const MusicPlayer = {
 
     getActiveAudio() {
         return this.activeLayout === 'traanstock' ? this.traanAudio : this.worldAudio;
+    },
+
+    getInactiveAudio() {
+        return this.activeLayout === 'traanstock' ? this.worldAudio : this.traanAudio;
     },
 
     handleAnnouncementEnded() {
@@ -205,12 +234,22 @@ const MusicPlayer = {
                         this.worldAudio.loop = true;
                     }
                     const seekAndPlay = () => {
+                        if (this.getActiveAudio() !== this.worldAudio) {
+                            this.worldAudio.pause();
+                            this.worldAudio.volume = 0;
+                            return;
+                        }
                         const dur = this.worldAudio.duration || info.duration;
                         try {
                             this.worldAudio.currentTime = info.targetTime % dur;
                         } catch (e) { }
                         if (!this.isMuted) {
                             this.worldAudio.play().then(() => {
+                                if (this.getActiveAudio() !== this.worldAudio) {
+                                    this.worldAudio.pause();
+                                    this.worldAudio.volume = 0;
+                                    return;
+                                }
                                 this.hasInteracted = true;
                                 fadeAudio(this.worldAudio, this.targetVolume, 2000);
                             }).catch(() => { });
@@ -236,17 +275,23 @@ const MusicPlayer = {
             this.resetTransition();
 
             if (layout === 'traanstock') {
-                fadeAudio(this.worldAudio, 0, 800, () => {
-                    if (this.worldAudio) {
-                        this.worldAudio.pause();
-                    }
-                });
+                if (this.worldAudio) {
+                    fadeAudio(this.worldAudio, 0, 800, () => {
+                        if (this.worldAudio && this.getActiveAudio() !== this.worldAudio) {
+                            this.worldAudio.pause();
+                            this.worldAudio.volume = 0;
+                        }
+                    });
+                }
             } else {
-                fadeAudio(this.traanAudio, 0, 800, () => {
-                    if (this.traanAudio) {
-                        this.traanAudio.pause();
-                    }
-                });
+                if (this.traanAudio) {
+                    fadeAudio(this.traanAudio, 0, 800, () => {
+                        if (this.traanAudio && this.getActiveAudio() !== this.traanAudio) {
+                            this.traanAudio.pause();
+                            this.traanAudio.volume = 0;
+                        }
+                    });
+                }
             }
 
             const now = typeof getAppTime === 'function' ? getAppTime() : Date.now();
@@ -390,6 +435,12 @@ const MusicPlayer = {
     },
 
     sync(now, forcePlay = false) {
+        const inactiveAudio = this.getInactiveAudio();
+        if (inactiveAudio && !inactiveAudio.paused && !inactiveAudio._fadeInterval) {
+            inactiveAudio.pause();
+            inactiveAudio.volume = 0;
+        }
+
         if (this.activeLayout === 'worldevents') {
             const worldFetcher = window.getWorldEventAtTimestamp || getWorldEventAtTimestamp;
             const currentWorld = typeof worldFetcher === 'function' ? worldFetcher(now) : null;
@@ -465,12 +516,22 @@ const MusicPlayer = {
 
             const onCanPlay = () => {
                 audio.removeEventListener('canplay', onCanPlay);
+                if (this.getActiveAudio() !== audio) {
+                    audio.pause();
+                    audio.volume = 0;
+                    return;
+                }
                 const dur = audio.duration || info.duration;
                 try {
                     audio.currentTime = info.targetTime % dur;
                 } catch (e) { }
                 if (!this.isMuted && this.transitionPhase === 'normal') {
                     audio.play().then(() => {
+                        if (this.getActiveAudio() !== audio) {
+                            audio.pause();
+                            audio.volume = 0;
+                            return;
+                        }
                         this.hasInteracted = true;
                         fadeAudio(audio, this.targetVolume, 1500);
                     }).catch(() => { });
@@ -484,6 +545,11 @@ const MusicPlayer = {
                 audio.load();
             }
         } else {
+            if (this.getActiveAudio() !== audio) {
+                audio.pause();
+                audio.volume = 0;
+                return;
+            }
             if (!this.isMuted && audio.paused && !audio._isStarting && this.transitionPhase === 'normal') {
                 audio._isStarting = true;
                 const dur = audio.duration || info.duration;
@@ -494,6 +560,11 @@ const MusicPlayer = {
                 } catch (e) { }
                 audio.play().then(() => {
                     audio._isStarting = false;
+                    if (this.getActiveAudio() !== audio) {
+                        audio.pause();
+                        audio.volume = 0;
+                        return;
+                    }
                     this.hasInteracted = true;
                     fadeAudio(audio, this.targetVolume, 1500);
                 }).catch(() => {

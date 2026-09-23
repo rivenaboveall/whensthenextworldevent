@@ -163,7 +163,7 @@ const WorldEventsLayout = {
         this.bgImageDisasterElement = document.getElementById('bg-image-disaster');
         this.bgCurtainElement = document.getElementById('bg-black-curtain');
 
-        const activeLayout = localStorage.getItem('user_active_layout') || 'worldevents';
+        const activeLayout = (window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('/traan-zakshun')) ? 'traanstock' : 'worldevents';
         const now = (typeof getAppTime === 'function') ? getAppTime() : Date.now();
         const initialWorld = getWorldEventAtTimestamp(now);
         if (initialWorld && initialWorld.event) {
