@@ -1,0 +1,227 @@
+.date-seasons-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1100px;
+  height: 100%;
+  min-height: calc(100vh - 12rem);
+  flex: 1;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.ds-datetime-badge {
+  position: absolute;
+  top: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  font-weight: 600;
+  color: rgba(240, 246, 252, 0.9);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+  text-align: center;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.date-seasons-center-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  margin: 0;
+}
+
+.date-seasons-layout .event-gradient-text {
+  text-shadow: none !important;
+}
+
+.gradient-day,
+.gradient-morning,
+.gradient-afternoon {
+  background-image: linear-gradient(135deg, #fde047 0%, #ffffff 50%, #eab308 100%);
+  color: #eab308;
+}
+
+.text-glow-day,
+.text-glow-morning,
+.text-glow-afternoon {
+  filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.3));
+}
+
+.gradient-night,
+.gradient-dusk,
+.gradient-dawn {
+  background-image: linear-gradient(135deg, #60a5fa 0%, #ffffff 50%, #2563eb 100%);
+  color: #3b82f6;
+}
+
+.text-glow-night,
+.text-glow-dusk,
+.text-glow-dawn {
+  filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
+}
+
+.gradient-season-autumn {
+  background-image: linear-gradient(135deg, #fdba74 0%, #ffffff 50%, #ea580c 100%);
+  color: #ea580c;
+}
+
+.gradient-season-summer {
+  background-image: linear-gradient(135deg, #fde047 0%, #ffffff 50%, #ca8a04 100%);
+  color: #ca8a04;
+}
+
+.gradient-season-winter {
+  background-image: linear-gradient(135deg, #ffffff 0%, #bae6fd 50%, #0284c7 100%);
+  color: #0284c7;
+}
+
+.gradient-season-spring {
+  background-image: linear-gradient(135deg, #86efac 0%, #ffffff 50%, #16a34a 100%);
+  color: #16a34a;
+}
+
+.ds-phase-title {
+  font-size: clamp(1.75rem, 3.2vw, 2.85rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.35;
+  text-align: center;
+  overflow: visible;
+  color: var(--text-primary);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  max-width: 100%;
+}
+
+.ds-phase-title .event-gradient-text {
+  font-weight: 800;
+  text-shadow: none !important;
+}
+
+.ds-season-container {
+  position: absolute;
+  bottom: -3.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 980px;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.ds-season-header {
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  letter-spacing: 0.2px;
+  margin-bottom: 0.85rem;
+}
+
+.ds-season-name {
+  font-weight: 700;
+}
+
+.ds-season-changes-card {
+  padding: 0 1rem;
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  justify-content: center;
+}
+
+.ds-season-changes-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.ds-season-changes-list li {
+  margin-bottom: 0.45rem;
+}
+
+.ds-season-changes-list li:last-child {
+  margin-bottom: 0;
+}
+
+.wiki-link {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.wiki-link:hover {
+  color: #7dd3fc;
+  text-decoration: none;
+}
+
+@media (max-width: 960px) {
+  .date-seasons-layout {
+    padding: 0 0.85rem;
+    min-height: calc(100dvh - 5.5rem);
+    justify-content: space-between;
+  }
+
+  .ds-datetime-badge {
+    position: static;
+    transform: none;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+    font-size: 0.85rem;
+  }
+
+  .date-seasons-center-column {
+    margin: auto 0;
+  }
+
+  .ds-phase-title {
+    font-size: clamp(1.35rem, 4.8vw, 1.85rem);
+  }
+
+  .ds-season-container {
+    position: static;
+    transform: none;
+    margin-top: auto;
+    margin-bottom: 0.5rem;
+    padding: 0 0.5rem;
+    max-width: 100%;
+  }
+
+  .ds-season-changes-card {
+    padding: 0 0.5rem;
+    max-width: 100%;
+  }
+
+  .ds-season-header {
+    font-size: 1.05rem;
+  }
+
+  .ds-season-changes-list {
+    font-size: 0.82rem;
+  }
+}

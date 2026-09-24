@@ -21,23 +21,6 @@ jobs:
         with:
           token: ${{ steps.bot-token.outputs.token }}
 
-      - name: Cache APT packages
-        id: cache-apt
-        uses: actions/cache@v4
-        with:
-          path: .apt-cache
-          key: apt-tesseract-${{ runner.os }}
-
-      - name: Install APT Dependencies
-        run: |
-          mkdir -p .apt-cache
-          if [ "${{ steps.cache-apt.outputs.cache-hit }}" != "true" ]; then
-            sudo apt-get update
-            sudo apt-get install -y --download-only tesseract-ocr libtesseract-dev
-            cp -n /var/cache/apt/archives/*.deb .apt-cache/ 2>/dev/null || true
-          fi
-          sudo dpkg -i -E .apt-cache/*.deb || sudo apt-get -f install -y
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -51,9 +34,17 @@ jobs:
           restore-keys: |
             pip-${{ runner.os }}-3.11-
 
+      - name: Cache PaddleOCR Models
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.paddlex
+            ~/.paddleocr
+          key: paddle-models-${{ runner.os }}-v1
+
       - name: Install Py Dependencies
         run: |
-          pip install pytesseract pillow
+          pip install -r requirements.txt
 
       - name: Fetch Discord Messages and Update Upstash
         env:
@@ -61,4 +52,4 @@ jobs:
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
           UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-        run: python3 src/scan_traan.py
+        run: python3 .github/scripts/scan_traan.py

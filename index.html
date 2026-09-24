@@ -21,14 +21,20 @@
   <link rel="preload" as="image" href="assets/images/Parasol.webp">
   <link rel="preload" as="image" href="assets/images/CindersOfEtris.webp">
   <link rel="preload" as="image" href="assets/images/Caeranthil.webp">
-  <meta name="description" content="Live countdown tracker for Deepwoken World Events, Luminant Disasters, and Traan Zakshun's Black Market rotations.">
+  <link rel="preload" as="image" href="assets/images/Seasons/Spring.webp">
+  <link rel="preload" as="image" href="assets/images/Seasons/Summer.webp">
+  <link rel="preload" as="image" href="assets/images/Seasons/Autumn.webp">
+  <link rel="preload" as="image" href="assets/images/Seasons/Winter.webp">
+  <meta name="description"
+    content="Live countdown tracker for Deepwoken World Events, Etrean Luminant Disasters, Traan Zakshun's market rotations and Date and Season Updates.">
   <meta name="theme-color" content="#0b0f17">
   <link rel="icon" type="image/webp" href="assets/icons/ItemImage.webp">
-  <link rel="stylesheet" href="src/components/base.css?v=1">
-  <link rel="stylesheet" href="src/components/header.css?v=1">
-  <link rel="stylesheet" href="src/components/tooltip.css?v=1">
-  <link rel="stylesheet" href="src/components/worldevents.css?v=1">
-  <link rel="stylesheet" href="src/components/traanstock.css?v=1">
+  <link rel="stylesheet" href="src/styles/base.css?v=2">
+  <link rel="stylesheet" href="src/styles/header.css?v=3">
+  <link rel="stylesheet" href="src/styles/tooltip.css?v=2">
+  <link rel="stylesheet" href="pages/world-events/worldevents.css?v=2">
+  <link rel="stylesheet" href="pages/traan-zakshun/traanstock.css?v=2">
+  <link rel="stylesheet" href="pages/date-seasons/dateseasons.css?v=12">
 </head>
 
 <body>
@@ -94,10 +100,30 @@
       </div>
     </div>
     <div class="top-bar-right">
-      <button id="layout-switch-btn" class="nav-btn layout-switch-btn" type="button" aria-label="Switch Layout"
-        data-hover-text="Switch to Traan's Hourly Market and Black Market Rotation, Info is fetched from the Deepwoken Info Discord Server.">
-        <span id="layout-switch-label">Switch to Traan Zakshun's Rotation</span>
-      </button>
+      <div id="event-type-dropdown" class="event-type-dropdown">
+        <button id="event-type-btn" class="nav-btn event-type-btn" type="button" aria-haspopup="true"
+          aria-expanded="false" data-hover-text="Select global event tracker">
+          <span id="event-type-label">World Events</span>
+          <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor"
+            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div id="event-type-menu" class="event-type-menu layout-hidden" role="menu">
+          <button class="event-type-item" type="button" role="menuitem" data-page="worldevents">
+            <span class="event-type-item-text">World Events</span>
+            <span class="event-type-item-indicator">&#10003;</span>
+          </button>
+          <button class="event-type-item" type="button" role="menuitem" data-page="traanstock">
+            <span class="event-type-item-text">Traan Zakshun's Market</span>
+            <span class="event-type-item-indicator">&#10003;</span>
+          </button>
+          <button class="event-type-item" type="button" role="menuitem" data-page="dateseasons">
+            <span class="event-type-item-text">Current Date and Season</span>
+            <span class="event-type-item-indicator">&#10003;</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -116,9 +142,7 @@
           <h2 id="join-status" class="join-status-heading">Time Left to join: --</h2>
         </div>
 
-        <div class="mobile-timer-container">
-          <div id="main-mobile-timer" class="mobile-timer"></div>
-        </div>
+        <div id="main-mobile-timer" class="mobile-timer"></div>
       </section>
 
       <section id="disaster-section" class="event-column disaster-column">
@@ -133,9 +157,7 @@
           <h1 id="current-disaster-name" class="current-event-title event-gradient-text"></h1>
         </div>
 
-        <div class="mobile-timer-container">
-          <div id="disaster-mobile-timer" class="mobile-timer"></div>
-        </div>
+        <div id="disaster-mobile-timer" class="mobile-timer"></div>
       </section>
     </div>
 
@@ -147,6 +169,40 @@
         </div>
         <div class="traan-header-divider"></div>
         <div id="traan-stock-grid" class="traan-stock-grid"></div>
+      </div>
+    </section>
+    <section id="date-seasons-layout" class="date-seasons-layout layout-hidden" aria-label="Current Date and Season">
+      <div class="ds-datetime-badge">
+        <span id="ds-datetime-val">--:--, ---- CE, -------</span>
+      </div>
+
+      <div class="date-seasons-center-column">
+        <div class="event-preview-container">
+          <div class="preview-item">
+            <span class="preview-prefix">Talents Active:</span>
+            <span id="ds-active-talent" class="event-gradient-text gradient-dawn text-glow-dawn">Dark Hours</span>
+          </div>
+        </div>
+
+        <div class="current-event-container">
+          <h1 id="ds-phase-heading" class="current-event-title ds-phase-title">
+            It is currently <span id="ds-phase-name" class="event-gradient-text gradient-dawn text-glow-dawn">Nighttime
+              (Dawn)</span>
+          </h1>
+          <h2 id="ds-time-left-heading" class="join-status-heading">
+            <span id="ds-time-left-prefix">Time left until Daytime:</span> <span id="ds-countdown-val">--</span>
+          </h2>
+        </div>
+      </div>
+
+      <div class="ds-season-container">
+        <div class="ds-season-header">
+          Current season is <span id="ds-season-name"
+            class="event-gradient-text ds-season-name gradient-season-autumn">Ardfall</span>
+        </div>
+        <div class="ds-season-changes-card" id="ds-season-changes-card">
+          <ul class="ds-season-changes-list" id="ds-season-changes-list"></ul>
+        </div>
       </div>
     </section>
   </main>
@@ -176,10 +232,13 @@
 
   <div id="cursor-hover-box" class="cursor-hover-box" aria-hidden="true"></div>
 
-  <script src="src/layouts/worldevents.js?v=6"></script>
-  <script src="src/layouts/traanstock.js?v=13"></script>
-  <script src="src/musicplayer.js?v=8"></script>
-  <script src="src/main.js?v=7"></script>
+  <script src="src/clock.js?v=1"></script>
+  <script src="src/database.js?v=1"></script>
+  <script src="pages/world-events/worldevents.js?v=8"></script>
+  <script src="pages/traan-zakshun/traanstock.js?v=14"></script>
+  <script src="pages/date-seasons/dateseasons.js?v=13"></script>
+  <script src="src/musicplayer.js?v=9"></script>
+  <script src="src/main.js?v=8"></script>
 </body>
 
 </html>

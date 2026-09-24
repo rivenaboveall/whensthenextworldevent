@@ -121,10 +121,8 @@ button {
 @media (max-width: 960px) {
   html,
   body {
-    height: 100%;
     height: 100dvh;
     overflow: hidden;
-    overscroll-behavior: none;
   }
 
   .bg-disaster-wrapper {

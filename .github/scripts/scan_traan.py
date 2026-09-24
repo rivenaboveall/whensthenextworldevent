@@ -5,8 +5,8 @@ import re
 import urllib.request
 import urllib.error
 import difflib
-from PIL import Image, ImageEnhance, ImageOps
-import pytesseract
+from PIL import Image, ImageOps
+from paddleocr import PaddleOCR
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
@@ -39,9 +39,6 @@ if sys.platform == "win32":
                 winreg.CloseKey(reg_key)
             except Exception:
                 pass
-
-if sys.platform == "win32":
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 upstash_url = os.environ.get("UPSTASH_REDIS_REST_URL")
 upstash_token = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
@@ -125,55 +122,23 @@ img_req = urllib.request.Request(
 with urllib.request.urlopen(img_req) as response, open(temp_img_path, "wb") as out_file:
     out_file.write(response.read())
 
-def locate_shop_header(img):
-    scale = 1.5
-    w_s = int(img.width * scale)
-    h_s = int(img.height * scale)
-    scaled = img.resize((w_s, h_s), Image.Resampling.BILINEAR)
-    gray = ImageOps.grayscale(scaled)
-    thr = gray.point(lambda p: 255 if p > 165 else 0)
-
-    data = pytesseract.image_to_data(thr, config="--psm 11", output_type=pytesseract.Output.DICT)
-    n = len(data["text"])
-
-    stock_hits = []
-    cache_hits = []
-
-    for i in range(n):
-        word = data["text"][i].strip().lower()
-        if not word:
+def locate_shop_header(rec_texts, rec_boxes, img_height):
+    for text, box in zip(rec_texts, rec_boxes):
+        min_y = box[1]
+        if min_y > img_height * 0.40:
             continue
-        top = data["top"][i] / scale
-        if top > img.height * 0.40:
-            continue
-        l = data["left"][i] / scale
-        width = data["width"][i] / scale
-        height = data["height"][i] / scale
+        text_low = text.lower()
+        if any(k in text_low for k in ["salvaged", "stock"]):
+            return "stock", min_y
+        if any(k in text_low for k in ["black", "cache", "market"]):
+            return "cache", min_y
 
-        if any(k in word for k in ["salvaged", "stock"]):
-            stock_hits.append((l, top, width, height))
-        if any(k in word for k in ["black", "cache", "market"]):
-            cache_hits.append((l, top, width, height))
-
-    if stock_hits:
-        min_x = min(hit[0] for hit in stock_hits)
-        min_y = min(hit[1] for hit in stock_hits)
-        max_x = max(hit[0] + hit[2] for hit in stock_hits)
-        max_y = max(hit[1] + hit[3] for hit in stock_hits)
-        return "stock", {"min_x": min_x, "min_y": min_y, "max_x": max_x, "max_y": max_y}
-
-    if cache_hits:
-        min_x = min(hit[0] for hit in cache_hits)
-        min_y = min(hit[1] for hit in cache_hits)
-        max_x = max(hit[0] + hit[2] for hit in cache_hits)
-        max_y = max(hit[1] + hit[3] for hit in cache_hits)
-        return "cache", {"min_x": min_x, "min_y": min_y, "max_x": max_x, "max_y": max_y}
-
-    full_str = pytesseract.image_to_string(gray, config="--psm 6").lower()
-    if "black market" in full_str or "cache" in full_str:
-        return "cache", None
-    if "salvaged" in full_str or "stock" in full_str or "traan" in full_str:
-        return "stock", None
+    for text in rec_texts:
+        text_low = text.lower()
+        if "black market" in text_low or "cache" in text_low:
+            return "cache", None
+        if "salvaged" in text_low or "stock" in text_low or "traan" in text_low:
+            return "stock", None
 
     return None, None
 
@@ -244,43 +209,25 @@ def match_items_from_text(text_lines, shop_mode):
 
 try:
     img = Image.open(temp_img_path)
+    img = ImageOps.expand(img, border=20, fill="black")
+    img.save(temp_img_path)
     w, h = img.size
 
-    shop_type, header_box = locate_shop_header(img)
+    ocr = PaddleOCR(use_textline_orientation=False, lang="en", enable_mkldnn=False)
+    ocr_output = list(ocr.predict(temp_img_path))
+    res = ocr_output[0] if ocr_output else {}
+    rec_texts = res.get("rec_texts", [])
+    rec_boxes = res.get("rec_boxes", [])
+
+    shop_type, header_y = locate_shop_header(rec_texts, rec_boxes, h)
     is_traan = shop_type is not None
 
-    if header_box:
-        cx1 = 0
-        cy1 = max(0, int(header_box["min_y"] - 30))
-        cx2 = min(w, int(w * 0.88))
-        cy2 = min(h, int(header_box["min_y"] + h * 0.75))
-        shop_crop = img.crop((cx1, cy1, cx2, cy2))
-    else:
-        shop_crop = img.crop((0, 0, int(w * 0.88), int(h * 0.85)))
-
-    cw, ch = shop_crop.size
-    mid_x = cw // 2
-    left_crop = shop_crop.crop((0, 0, min(cw, mid_x + 80), ch))
-    right_crop = shop_crop.crop((max(0, mid_x - 80), 0, cw, ch))
-
-    crops_to_scan = [shop_crop, left_crop, right_crop]
-
     all_lines = []
-    for crop_img in crops_to_scan:
-        cw_c, ch_c = crop_img.size
-        scaled_crop = crop_img.resize((cw_c * 2, ch_c * 2), Image.Resampling.BILINEAR)
-        gray_crop = ImageOps.grayscale(scaled_crop)
-        enhanced = ImageEnhance.Contrast(gray_crop).enhance(2.5)
-        white_thr = gray_crop.point(lambda p: 255 if p > 175 else 0)
-
-        data_sparse = pytesseract.image_to_string(white_thr, config="--psm 11")
-        all_lines.extend([line.strip() for line in data_sparse.splitlines() if line.strip()])
-
-        data_block = pytesseract.image_to_string(enhanced, config="--psm 6")
-        all_lines.extend([line.strip() for line in data_block.splitlines() if line.strip()])
-
-        data_single = pytesseract.image_to_string(gray_crop, config="--psm 4")
-        all_lines.extend([line.strip() for line in data_single.splitlines() if line.strip()])
+    for text, box in zip(rec_texts, rec_boxes):
+        min_y = box[1]
+        if header_y is not None and min_y <= header_y:
+            continue
+        all_lines.append(text)
 
     active_mode = shop_type if shop_type else "stock"
     items_found = match_items_from_text(all_lines, active_mode)

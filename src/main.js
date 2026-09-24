@@ -10,14 +10,20 @@ const menuRemindTraanStatus = document.getElementById('menu-remind-traan-status'
 const soundtrackButtons = document.querySelectorAll('.menu-item-soundtrack');
 const soundtrackStatuses = document.querySelectorAll('.menu-soundtrack-status');
 
-const layoutSwitchBtn = document.getElementById('layout-switch-btn');
-const layoutSwitchLabel = document.getElementById('layout-switch-label');
+const eventTypeDropdown = document.getElementById('event-type-dropdown');
+const eventTypeBtn = document.getElementById('event-type-btn');
+const eventTypeLabel = document.getElementById('event-type-label');
+const eventTypeMenu = document.getElementById('event-type-menu');
+const eventTypeItems = document.querySelectorAll('.event-type-item');
 const testEventBtn = document.getElementById('test-event-btn');
 const cursorHoverBox = document.getElementById('cursor-hover-box');
 let currentHoverTarget = null;
 let testTimeOffsetMs = 0;
 
 function getAppTime() {
+	if (window.Clock) {
+		return window.Clock.getTime();
+	}
 	return Date.now() + testTimeOffsetMs;
 }
 
@@ -44,7 +50,7 @@ if (redirectPath) {
 }
 
 function getBasePath() {
-	const clean = window.location.pathname.replace(/\/(world-events|traan-zakshun)\/?$/, '');
+	const clean = window.location.pathname.replace(/\/(pages\/(world-events|traan-zakshun|date-seasons)|world-events|traan-zakshun|date-seasons)\/?$/, '');
 	return clean.endsWith('/') ? clean.slice(0, -1) : clean;
 }
 
@@ -53,12 +59,20 @@ function getInitialLayout() {
 	if (path.includes('/traan-zakshun')) {
 		return 'traanstock';
 	}
+	if (path.includes('/date-seasons')) {
+		return 'dateseasons';
+	}
 	return 'worldevents';
 }
 
 function updateLayoutUrl(layout, replace = false) {
 	const basePath = getBasePath();
-	const targetSegment = layout === 'traanstock' ? '/traan-zakshun/' : '/world-events/';
+	let targetSegment = '/world-events/';
+	if (layout === 'traanstock') {
+		targetSegment = '/traan-zakshun/';
+	} else if (layout === 'dateseasons') {
+		targetSegment = '/date-seasons/';
+	}
 	const targetPath = `${basePath}${targetSegment}`;
 	if (window.location.pathname !== targetPath) {
 		if (replace) {
@@ -173,22 +187,52 @@ function checkEventTransitions(currentWorld, currentDisaster, currentTraan) {
 	}
 }
 
-function updateLayoutSwitchUI() {
-	if (layoutSwitchLabel) {
+function toggleEventTypeDropdown(open) {
+	if (!eventTypeMenu || !eventTypeBtn) {
+		return;
+	}
+	const isCurrentlyHidden = eventTypeMenu.classList.contains('layout-hidden');
+	const shouldOpen = typeof open === 'boolean' ? open : isCurrentlyHidden;
+	eventTypeMenu.classList.toggle('layout-hidden', !shouldOpen);
+	eventTypeBtn.setAttribute('aria-expanded', String(shouldOpen));
+	if (shouldOpen && cursorHoverBox && currentHoverTarget && currentHoverTarget.closest('#event-type-dropdown')) {
+		cursorHoverBox.classList.remove('visible');
+		currentHoverTarget = null;
+	}
+}
+
+function closeEventTypeDropdown() {
+	if (!eventTypeMenu || !eventTypeBtn) {
+		return;
+	}
+	eventTypeMenu.classList.add('layout-hidden');
+	eventTypeBtn.setAttribute('aria-expanded', 'false');
+	if (cursorHoverBox && currentHoverTarget && currentHoverTarget.closest('#event-type-dropdown')) {
+		cursorHoverBox.classList.remove('visible');
+		currentHoverTarget = null;
+	}
+}
+
+function updateEventTypeUI() {
+	if (eventTypeLabel) {
 		if (currentLayout === 'worldevents') {
-			layoutSwitchLabel.textContent = "Switch to Traan Zakshun's Rotation";
+			eventTypeLabel.textContent = 'World Events';
+		} else if (currentLayout === 'traanstock') {
+			eventTypeLabel.textContent = "Traan Zakshun's Market";
+		} else if (currentLayout === 'dateseasons') {
+			eventTypeLabel.textContent = 'Current Date and Season';
 		} else {
-			layoutSwitchLabel.textContent = 'Switch to World Events';
+			eventTypeLabel.textContent = 'Select Event Type';
 		}
 	}
-	if (layoutSwitchBtn) {
-		const hoverText = currentLayout === 'worldevents'
-			? "Switch to Traan's Hourly Market and Black Market Rotation, Info is fetched from the Deepwoken Info Discord Server."
-			: "Switch to World Events, Updates every half hour / Every Hour for Etrean Disasters";
-		layoutSwitchBtn.setAttribute('data-hover-text', hoverText);
-		if (currentHoverTarget === layoutSwitchBtn && cursorHoverBox) {
-			cursorHoverBox.textContent = hoverText;
-		}
+
+	if (eventTypeItems) {
+		eventTypeItems.forEach((item) => {
+			const page = item.getAttribute('data-page');
+			const isActive = page === currentLayout;
+			item.classList.toggle('active', isActive);
+			item.setAttribute('aria-selected', String(isActive));
+		});
 	}
 }
 
@@ -212,6 +256,9 @@ function applyLayout(targetLayout, updateHistory = 'push') {
 		if (window.TraanStockLayout) {
 			window.TraanStockLayout.unmount();
 		}
+		if (window.DateSeasonsPage) {
+			window.DateSeasonsPage.unmount();
+		}
 		if (window.WorldEventsLayout) {
 			window.WorldEventsLayout.mount();
 		}
@@ -219,8 +266,21 @@ function applyLayout(targetLayout, updateHistory = 'push') {
 		if (window.WorldEventsLayout) {
 			window.WorldEventsLayout.unmount();
 		}
+		if (window.DateSeasonsPage) {
+			window.DateSeasonsPage.unmount();
+		}
 		if (window.TraanStockLayout) {
 			window.TraanStockLayout.mount();
+		}
+	} else if (targetLayout === 'dateseasons') {
+		if (window.WorldEventsLayout) {
+			window.WorldEventsLayout.unmount();
+		}
+		if (window.TraanStockLayout) {
+			window.TraanStockLayout.unmount();
+		}
+		if (window.DateSeasonsPage) {
+			window.DateSeasonsPage.mount();
 		}
 	}
 
@@ -228,7 +288,7 @@ function applyLayout(targetLayout, updateHistory = 'push') {
 		window.MusicPlayer.setLayout(currentLayout);
 	}
 
-	updateLayoutSwitchUI();
+	updateEventTypeUI();
 	updateMenuGroupVisibility();
 
 	if (updateHistory === 'push') {
@@ -307,6 +367,10 @@ function render() {
 		traanResult = window.TraanStockLayout.render(now);
 	}
 
+	if (window.DateSeasonsPage) {
+		window.DateSeasonsPage.render(now);
+	}
+
 	const currentWorld = worldResult ? worldResult.currentWorld : null;
 	const currentDisaster = worldResult ? worldResult.currentDisaster : null;
 	checkEventTransitions(currentWorld, currentDisaster, traanResult);
@@ -327,11 +391,15 @@ document.addEventListener('click', (e) => {
 	if (sideMenuDropdown && !sideMenuDropdown.contains(e.target) && e.target !== burgerMenuBtn && !burgerMenuBtn.contains(e.target)) {
 		closeBurgerMenu();
 	}
+	if (eventTypeMenu && !eventTypeMenu.contains(e.target) && e.target !== eventTypeBtn && !eventTypeBtn.contains(e.target)) {
+		closeEventTypeDropdown();
+	}
 });
 
 document.addEventListener('keydown', (e) => {
 	if (e.key === 'Escape') {
 		closeBurgerMenu();
+		closeEventTypeDropdown();
 	}
 });
 
@@ -368,10 +436,22 @@ soundtrackButtons.forEach((btn) => {
 	});
 });
 
-if (layoutSwitchBtn) {
-	layoutSwitchBtn.addEventListener('click', () => {
-		const nextLayout = currentLayout === 'worldevents' ? 'traanstock' : 'worldevents';
-		switchLayout(nextLayout);
+if (eventTypeBtn) {
+	eventTypeBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleEventTypeDropdown();
+	});
+}
+
+if (eventTypeItems) {
+	eventTypeItems.forEach((item) => {
+		item.addEventListener('click', () => {
+			const targetPage = item.getAttribute('data-page');
+			if (targetPage && targetPage !== currentLayout) {
+				switchLayout(targetPage);
+			}
+			closeEventTypeDropdown();
+		});
 	});
 }
 
@@ -391,6 +471,9 @@ if (testEventBtn) {
 		const currentWorld = getWorldEventAtTimestamp(now);
 		const targetNextEventTime = now + 20000;
 		testTimeOffsetMs += (currentWorld.endTime - targetNextEventTime);
+		if (window.Clock) {
+			window.Clock.setOffset(testTimeOffsetMs);
+		}
 		const updatedNow = getAppTime();
 		const updatedWorld = getWorldEventAtTimestamp(updatedNow);
 		lastWorldSlotIndex = updatedWorld.slotIndex;
@@ -418,6 +501,15 @@ function updateCursorHover(e) {
 
 	const menuDropdownParent = target.closest('#side-menu-dropdown');
 	if (menuDropdownParent && menuDropdownParent.classList.contains('layout-hidden')) {
+		if (currentHoverTarget) {
+			currentHoverTarget = null;
+			cursorHoverBox.classList.remove('visible');
+		}
+		return;
+	}
+
+	const eventTypeDropdownParent = target.closest('#event-type-dropdown');
+	if (eventTypeDropdownParent && eventTypeMenu && !eventTypeMenu.classList.contains('layout-hidden')) {
 		if (currentHoverTarget) {
 			currentHoverTarget = null;
 			cursorHoverBox.classList.remove('visible');
@@ -491,6 +583,9 @@ if (window.WorldEventsLayout) {
 }
 if (window.TraanStockLayout) {
 	window.TraanStockLayout.init();
+}
+if (window.DateSeasonsPage) {
+	window.DateSeasonsPage.init();
 }
 if (window.MusicPlayer) {
 	window.MusicPlayer.init();

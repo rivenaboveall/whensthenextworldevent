@@ -1,6 +1,3 @@
-const UPSTASH_REDIS_URL = 'https://sacred-seahorse-292012.upstash.io';
-const UPSTASH_READ_ONLY_TOKEN = 'ggAAAAAABHSsAAIgcDJka24B63kPac6eR7Tmr5tDxvEd48POsa9IS8Fej5sXSA';
-
 const TRAAN_INTERVAL_MS = 20 * 60 * 60 * 1000;
 const TRAAN_ANCHOR_TIMESTAMP = Date.UTC(2026, 8, 23, 4, 0, 0);
 
@@ -160,24 +157,12 @@ const TraanStockLayout = {
         this.isFetchingSiteData = true;
 
         try {
-            const response = await fetch(`${UPSTASH_REDIS_URL}/json.get/TRAAN_METADATA`, {
-                cache: 'no-store',
-                headers: {
-                    Authorization: `Bearer ${UPSTASH_READ_ONLY_TOKEN}`
-                }
-            });
-            if (response.ok) {
-                const resJson = await response.json();
-                let data = resJson.result;
-                if (typeof data === 'string') {
-                    data = JSON.parse(data);
-                }
-                if (data && typeof data === 'object') {
-                    this.siteData = data;
-                    this.isFetchingSiteData = false;
-                    this.updateTopic();
-                    return;
-                }
+            const data = await window.Database.getTraanMetadata();
+            if (data && typeof data === 'object') {
+                this.siteData = data;
+                this.isFetchingSiteData = false;
+                this.updateTopic();
+                return;
             }
         } catch (e) { }
 
@@ -246,26 +231,14 @@ const TraanStockLayout = {
         this.isFetching = true;
 
         try {
-            const response = await fetch(`${UPSTASH_REDIS_URL}/json.get/TRAAN_STOCK`, {
-                cache: 'no-store',
-                headers: {
-                    Authorization: `Bearer ${UPSTASH_READ_ONLY_TOKEN}`
-                }
-            });
-            if (response.ok) {
-                const resJson = await response.json();
-                let data = resJson.result;
-                if (typeof data === 'string') {
-                    data = JSON.parse(data);
-                }
-                if (data && Array.isArray(data.items)) {
-                    this.stockData = data;
-                    this.lastFetchTime = now;
-                    this.renderStock();
-                    this.updateTopic();
-                    this.isFetching = false;
-                    return;
-                }
+            const data = await window.Database.getTraanStock();
+            if (data && Array.isArray(data.items)) {
+                this.stockData = data;
+                this.lastFetchTime = now;
+                this.renderStock();
+                this.updateTopic();
+                this.isFetching = false;
+                return;
             }
         } catch (e) { }
 
@@ -354,4 +327,5 @@ const TraanStockLayout = {
 };
 
 window.TraanStockLayout = TraanStockLayout;
+window.TraanStockPage = TraanStockLayout;
 window.getTraanStockAtTimestamp = getTraanStockAtTimestamp;

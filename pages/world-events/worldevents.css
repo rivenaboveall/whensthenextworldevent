@@ -114,7 +114,7 @@
   font-weight: 700;
 }
 
-.mobile-timer-container {
+.mobile-timer {
   display: none;
 }
 
@@ -261,12 +261,9 @@
 @media (max-width: 960px) {
   .center-container {
     padding: 3.5rem 1rem 1rem 1rem;
-    height: 100%;
     height: 100dvh;
-    max-height: 100dvh;
     overflow: hidden;
     align-items: stretch;
-    box-sizing: border-box;
   }
 
   .events-grid {
@@ -334,19 +331,13 @@
     gap: 0.35rem;
   }
 
-  .mobile-timer-container {
-    order: 3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin-top: 0.25rem;
-  }
-
   .mobile-timer {
+    order: 3;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    margin-top: 0.25rem;
     white-space: nowrap;
     font-size: clamp(0.82rem, 2.7vw, 1.02rem);
     line-height: 1.35;

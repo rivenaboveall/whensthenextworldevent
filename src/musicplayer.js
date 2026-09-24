@@ -76,7 +76,7 @@ const MusicPlayer = {
     announcementAudio: null,
     currentTrackSrc: '',
     isMuted: localStorage.getItem('user_soundtrack_muted') === 'true',
-    activeLayout: (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('/traan-zakshun')) ? 'traanstock' : 'worldevents',
+    activeLayout: (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('/traan-zakshun')) ? 'traanstock' : ((typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('/date-seasons')) ? 'dateseasons' : 'worldevents'),
     hasInteracted: false,
     transitionPhase: 'normal',
     lastWorldSlotIndex: null,
@@ -213,11 +213,23 @@ const MusicPlayer = {
     },
 
     getActiveAudio() {
-        return this.activeLayout === 'traanstock' ? this.traanAudio : this.worldAudio;
+        if (this.activeLayout === 'traanstock') {
+            return this.traanAudio;
+        }
+        if (this.activeLayout === 'worldevents') {
+            return this.worldAudio;
+        }
+        return null;
     },
 
     getInactiveAudio() {
-        return this.activeLayout === 'traanstock' ? this.worldAudio : this.traanAudio;
+        if (this.activeLayout === 'traanstock') {
+            return this.worldAudio;
+        }
+        if (this.activeLayout === 'worldevents') {
+            return this.traanAudio;
+        }
+        return null;
     },
 
     handleAnnouncementEnded() {
@@ -283,13 +295,26 @@ const MusicPlayer = {
                         }
                     });
                 }
-            } else {
+            } else if (layout === 'worldevents') {
                 if (this.traanAudio) {
                     fadeAudio(this.traanAudio, 0, 800, () => {
                         if (this.traanAudio && this.getActiveAudio() !== this.traanAudio) {
                             this.traanAudio.pause();
                             this.traanAudio.volume = 0;
                         }
+                    });
+                }
+            } else {
+                if (this.worldAudio) {
+                    fadeAudio(this.worldAudio, 0, 800, () => {
+                        this.worldAudio.pause();
+                        this.worldAudio.volume = 0;
+                    });
+                }
+                if (this.traanAudio) {
+                    fadeAudio(this.traanAudio, 0, 800, () => {
+                        this.traanAudio.pause();
+                        this.traanAudio.volume = 0;
                     });
                 }
             }
@@ -366,6 +391,10 @@ const MusicPlayer = {
     },
 
     getTargetTrackInfo(now) {
+        if (this.activeLayout !== 'traanstock' && this.activeLayout !== 'worldevents') {
+            return null;
+        }
+
         if (this.activeLayout === 'traanstock') {
             const traanFetcher = window.getTraanStockAtTimestamp || getTraanStockAtTimestamp;
             const currentTraan = typeof traanFetcher === 'function' ? traanFetcher(now) : null;

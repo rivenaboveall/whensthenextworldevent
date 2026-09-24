@@ -460,3 +460,4 @@ const WorldEventsLayout = {
 };
 
 window.WorldEventsLayout = WorldEventsLayout;
+window.WorldEventsPage = WorldEventsLayout;

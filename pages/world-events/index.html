@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
+  <base href="../../">
   <title>Redirecting...</title>
   <script>
     sessionStorage.setItem('redirect_path', window.location.pathname);
-    var repoPrefix = '/whensthenextworldevent/';
-    var target = window.location.pathname.startsWith(repoPrefix) ? repoPrefix : '/';
-    window.location.replace(target);
+    window.location.replace('./');
   </script>
 </head>
-
 <body>
 </body>
-
 </html>
