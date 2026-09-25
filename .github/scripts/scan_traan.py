@@ -142,61 +142,52 @@ def locate_shop_header(rec_texts, rec_boxes, img_height):
 
     return None, None
 
+def is_likely_item_title(text):
+    clean = text.strip()
+    if len(clean) < 3:
+        return False
+    if clean.lower() in {"purchase", "traan's", "salvaged", "stock", "traan", "black market", "cache"}:
+        return False
+    if re.fullmatch(r"^\d+\s*[\S]*$", clean):
+        return False
+    if any(p in clean for p in ["?", "!", "...", "*"]):
+        return False
+    if len(clean.split()) > 4:
+        return False
+    return True
+
 def match_items_from_text(text_lines, shop_mode):
-    catalog = ITEM_DATABASE.get(shop_mode, ITEM_DATABASE["stock"])
+    catalog = ITEM_DATABASE.get(shop_mode, ITEM_DATABASE.get("stock", {}))
     detected_items = {}
 
-    for raw_line in text_lines:
-        clean_line = re.sub(r"[^a-zA-Z0-9\s'-]", "", raw_line).strip()
-        if len(clean_line) < 3:
-            continue
+    filtered_lines = [line for line in text_lines if is_likely_item_title(line)]
 
-        words = clean_line.split()
-        n_words = len(words)
+    for raw_line in filtered_lines:
+        clean_line = re.sub(r"[^a-zA-Z0-9\s'-]", "", raw_line).strip()
         clean_line_low = clean_line.lower()
 
-        candidates = []
+        best_match = None
+        best_score = 0.0
 
         for name, data in catalog.items():
-            target_words = name.split()
-            n_target = len(target_words)
             name_low = name.lower()
+            score = difflib.SequenceMatcher(None, name_low, clean_line_low).ratio()
+            req_score = 0.88 if len(name.split()) > 1 else 0.92
 
-            if n_words <= n_target + 1:
-                score = difflib.SequenceMatcher(None, name_low, clean_line_low).ratio()
-                req_score = 0.88 if n_target > 1 else 0.90
-                if score >= req_score:
-                    candidates.append((score, 0, n_words, name, data))
-                continue
+            if score >= req_score and score > best_score:
+                best_score = score
+                best_match = (name, data)
 
-            for i in range(n_words - n_target + 1):
-                win = " ".join(words[i:i + n_target])
-                win_low = win.lower()
-
-                if abs(len(win_low) - len(name_low)) > max(3, int(len(name_low) * 0.25)):
-                    continue
-
-                score = difflib.SequenceMatcher(None, name_low, win_low).ratio()
-                req_score = 0.88 if n_target > 1 else 0.92
-
-                if score >= req_score:
-                    candidates.append((score, i, i + n_target, name, data))
-
-        candidates.sort(key=lambda c: c[0], reverse=True)
-
-        occupied_indices = set()
-        for score, s_idx, e_idx, name, data in candidates:
-            match_indices = set(range(s_idx, e_idx))
-            if not match_indices.intersection(occupied_indices):
-                occupied_indices.update(match_indices)
-                if name not in detected_items or score > detected_items[name]["score"]:
-                    detected_items[name] = {
-                        "name": name,
-                        "price": data["price"],
-                        "currency": data["currency"],
-                        "category": data["category"],
-                        "score": score
-                    }
+        if best_match:
+            name, data = best_match
+            if name not in detected_items or best_score > detected_items[name]["score"]:
+                detected_items[name] = {
+                    "name": name,
+                    "price": data["price"],
+                    "currency": data["currency"],
+                    "category": data["category"],
+                    "score": best_score
+                }
 
     sorted_items = sorted(detected_items.values(), key=lambda x: x["score"], reverse=True)[:8]
 
@@ -206,7 +197,7 @@ def match_items_from_text(text_lines, shop_mode):
         "currency": item["currency"],
         "category": item["category"]
     } for item in sorted_items]
-
+    
 try:
     img = Image.open(temp_img_path)
     img = ImageOps.expand(img, border=20, fill="black")

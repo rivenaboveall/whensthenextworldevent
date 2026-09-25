@@ -1,0 +1,9 @@
+{
+  "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
+  "files.exclude": {
+    "**/venv": true
+  },
+  "files.watcherExclude": {
+    "**/venv/**": true
+  }
+}
