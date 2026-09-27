@@ -390,7 +390,7 @@ const WorldEventsLayout = {
             this.mainTimerElement.textContent = formatDurationLabel(timeUntilNext, 'World Event');
         }
         if (this.mainMobileTimerElement) {
-            this.mainMobileTimerElement.innerHTML = `<span class="event-gradient-text ${next.event.gradientClass}">${next.event.name}</span>&nbsp;in ${formatDurationLabel(timeUntilNext)}`;
+            this.mainMobileTimerElement.innerHTML = `<span class="mobile-timer-name event-gradient-text ${next.event.gradientClass}">${next.event.name}</span><span class="mobile-timer-time">in ${formatDurationLabel(timeUntilNext)}</span>`;
         }
         return current;
     },
@@ -421,7 +421,7 @@ const WorldEventsLayout = {
             this.disasterTimerElement.textContent = formatDurationLabel(timeUntilNext, 'Disaster');
         }
         if (this.disasterMobileTimerElement) {
-            this.disasterMobileTimerElement.innerHTML = `<span class="event-gradient-text ${next.disaster.gradientClass}">${next.disaster.name}</span>&nbsp;in ${formatDurationLabel(timeUntilNext)}`;
+            this.disasterMobileTimerElement.innerHTML = `<span class="mobile-timer-name event-gradient-text ${next.disaster.gradientClass}">${next.disaster.name}</span><span class="mobile-timer-time">in ${formatDurationLabel(timeUntilNext)}</span>`;
         }
         return current;
     },

@@ -2,6 +2,7 @@ const burgerMenuBtn = document.getElementById('burger-menu-btn');
 const sideMenuDropdown = document.getElementById('side-menu-dropdown');
 const menuGroupWorldEvents = document.getElementById('menu-group-worldevents');
 const menuGroupTraan = document.getElementById('menu-group-traan');
+const menuGroupDateSeasons = document.getElementById('menu-group-dateseasons');
 
 const menuItemRemindWe = document.getElementById('menu-item-remind-we');
 const menuRemindWeStatus = document.getElementById('menu-remind-we-status');
@@ -33,9 +34,6 @@ let isRemindWE = localStorage.getItem('user_remind_we') === 'true';
 window.isRemindWEEnabled = () => isRemindWE;
 let isRemindTraan = localStorage.getItem('user_remind_traan') === 'true';
 let isSoundtrackMuted = localStorage.getItem('user_soundtrack_muted') === 'true';
-
-const announcementAudio = new Audio('assets/sounds/Announcement.mp3');
-announcementAudio.preload = 'auto';
 
 let lastWorldSlotIndex = null;
 let lastDisasterSlotIndex = null;
@@ -127,9 +125,6 @@ function requestNotificationPermission() {
 function playAnnouncementSound() {
 	if (window.MusicPlayer) {
 		window.MusicPlayer.playAnnouncement();
-	} else {
-		announcementAudio.currentTime = 0;
-		announcementAudio.play().catch(() => { });
 	}
 }
 
@@ -242,6 +237,9 @@ function updateMenuGroupVisibility() {
 	}
 	if (menuGroupTraan) {
 		menuGroupTraan.classList.toggle('layout-hidden', currentLayout !== 'traanstock');
+	}
+	if (menuGroupDateSeasons) {
+		menuGroupDateSeasons.classList.toggle('layout-hidden', currentLayout !== 'dateseasons');
 	}
 }
 
@@ -567,7 +565,6 @@ const unlockAudio = () => {
 	if (window.MusicPlayer && window.MusicPlayer.announcementAudio) {
 		window.MusicPlayer.announcementAudio.load();
 	}
-	announcementAudio.load();
 	window.removeEventListener('pointerdown', unlockAudio, { capture: true });
 	window.removeEventListener('click', unlockAudio, { capture: true });
 	window.removeEventListener('keydown', unlockAudio, { capture: true });
@@ -588,7 +585,7 @@ if (window.DateSeasonsPage) {
 	window.DateSeasonsPage.init();
 }
 if (window.MusicPlayer) {
-	window.MusicPlayer.init();
+	window.MusicPlayer.init(currentLayout);
 }
 
 switchLayout(currentLayout, true);

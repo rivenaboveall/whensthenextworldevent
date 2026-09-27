@@ -182,46 +182,101 @@
 
 @media (max-width: 960px) {
   .date-seasons-layout {
-    padding: 0 0.85rem;
-    min-height: calc(100dvh - 5.5rem);
-    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
   }
 
   .ds-datetime-badge {
-    position: static;
-    transform: none;
-    margin-top: 0.25rem;
-    margin-bottom: 0;
-    font-size: 0.85rem;
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    white-space: nowrap;
+    text-align: center;
+    z-index: 10;
   }
 
   .date-seasons-center-column {
-    margin: auto 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 5;
   }
 
   .ds-phase-title {
     font-size: clamp(1.35rem, 4.8vw, 1.85rem);
+    white-space: normal;
   }
 
   .ds-season-container {
-    position: static;
-    transform: none;
-    margin-top: auto;
-    margin-bottom: 0.5rem;
-    padding: 0 0.5rem;
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
     max-width: 100%;
+    margin: 0;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 5;
+  }
+
+  .ds-season-header {
+    font-size: clamp(0.95rem, 3.2vw, 1.15rem);
+    margin-bottom: 0.5rem;
   }
 
   .ds-season-changes-card {
     padding: 0 0.5rem;
     max-width: 100%;
-  }
-
-  .ds-season-header {
-    font-size: 1.05rem;
+    display: flex;
+    justify-content: center;
   }
 
   .ds-season-changes-list {
-    font-size: 0.82rem;
+    font-size: clamp(0.78rem, 2.6vw, 0.85rem);
+    line-height: 1.5;
+  }
+
+  .ds-season-changes-list li {
+    margin-bottom: 0.35rem;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 540px) {
+  .date-seasons-layout {
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0.85rem 1.5rem 0.85rem;
+    gap: 1rem;
+  }
+
+  .ds-datetime-badge,
+  .ds-season-container {
+    position: static;
+    transform: none;
   }
 }

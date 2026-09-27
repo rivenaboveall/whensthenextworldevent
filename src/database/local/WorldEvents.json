@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Battle Royale",
+        "gradientClass": "gradient-battle-royale",
+        "textGlowClass": "text-glow-battle-royale",
+        "bgImage": "assets/images/BattleRoyale.webp"
+    },
+    {
+        "name": "Carnival of Hearts",
+        "gradientClass": "gradient-carnival",
+        "textGlowClass": "text-glow-carnival",
+        "bgImage": "assets/images/Carnival.webp"
+    },
+    {
+        "name": "Interluminary Interloper",
+        "gradientClass": "gradient-interluminary",
+        "textGlowClass": "text-glow-interluminary",
+        "bgImage": "assets/images/Parasol.webp"
+    }
+]

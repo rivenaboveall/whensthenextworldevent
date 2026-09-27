@@ -244,6 +244,8 @@ const DateSeasonsPage = {
     elements: {},
     currentSeason: null,
     renderedSeason: null,
+    clockAnimationId: null,
+    lastInGameSeconds: null,
 
     init() {
         this.container = document.getElementById('date-seasons-layout');
@@ -283,12 +285,15 @@ const DateSeasonsPage = {
         }
         this.currentSeason = null;
         this.renderedSeason = null;
+        this.lastInGameSeconds = null;
         const now = (typeof getAppTime === 'function') ? getAppTime() : Date.now();
         this.render(now);
+        this.startClockLoop();
     },
 
     unmount() {
         this.isMounted = false;
+        this.stopClockLoop();
         if (!this.container) {
             this.container = document.getElementById('date-seasons-layout');
         }
@@ -297,6 +302,67 @@ const DateSeasonsPage = {
         }
         this.currentSeason = null;
         this.renderedSeason = null;
+        this.lastInGameSeconds = null;
+    },
+
+    startClockLoop() {
+        if (this.clockAnimationId) {
+            cancelAnimationFrame(this.clockAnimationId);
+        }
+        const tick = () => {
+            if (!this.isMounted) {
+                return;
+            }
+            const now = (typeof getAppTime === 'function') ? getAppTime() : Date.now();
+            this.updateClock(now);
+            this.clockAnimationId = requestAnimationFrame(tick);
+        };
+        this.clockAnimationId = requestAnimationFrame(tick);
+    },
+
+    stopClockLoop() {
+        if (this.clockAnimationId) {
+            cancelAnimationFrame(this.clockAnimationId);
+            this.clockAnimationId = null;
+        }
+    },
+
+    updateClock(now) {
+        if (!this.elements.datetimeVal) {
+            this.cacheElements();
+        }
+        if (!this.elements.datetimeVal) {
+            return;
+        }
+        const dn = getDayNightStatus(now);
+        if (dn.inGameSeconds === this.lastInGameSeconds) {
+            return;
+        }
+        this.lastInGameSeconds = dn.inGameSeconds;
+
+        const cal = getCalendarStatus(now);
+        const hh = String(dn.inGameHours).padStart(2, '0');
+        const mm = String(dn.inGameMinutes).padStart(2, '0');
+        const ss = String(dn.inGameSeconds).padStart(2, '0');
+        this.elements.datetimeVal.textContent = `${hh}:${mm}:${ss}, ${cal.year} CE, ${cal.currentMonth.name} (${cal.currentMonth.season})`;
+        this.elements.datetimeVal.className = '';
+    },
+
+    getAudioTrackInfo(now) {
+        const cal = getCalendarStatus(now || ((typeof getAppTime === 'function') ? getAppTime() : Date.now()));
+        const season = cal && cal.currentMonth && cal.currentMonth.season ? cal.currentMonth.season : 'Autumn';
+        const seasonDurations = {
+            Spring: 145.728979,
+            Summer: 158.302042,
+            Autumn: 140.505215,
+            Winter: 192.446979
+        };
+        const duration = seasonDurations[season];
+        return {
+            src: `assets/music/Seasons/${season}.mp3`,
+            duration: duration,
+            eventName: `${cal.currentMonth.name} (${season})`
+        };
     },
 
     render(now) {
@@ -308,20 +374,19 @@ const DateSeasonsPage = {
         const cal = getCalendarStatus(now);
 
         if (this.isMounted && this.currentSeason !== cal.currentMonth.season) {
+            const seasonChanged = this.currentSeason !== null;
             this.currentSeason = cal.currentMonth.season;
             const bgEl = document.getElementById('bg-image');
             if (bgEl) {
                 const bgUrl = SEASON_BACKGROUNDS[cal.currentMonth.season] || SEASON_BACKGROUNDS.Autumn;
                 bgEl.style.backgroundImage = `url("${bgUrl}")`;
             }
+            if (seasonChanged && window.MusicPlayer && window.MusicPlayer.activeLayout === 'dateseasons') {
+                window.MusicPlayer.currentTrackSrc = '';
+            }
         }
 
-        if (this.elements.datetimeVal) {
-            const hh = String(dn.inGameHours).padStart(2, '0');
-            const mm = String(dn.inGameMinutes).padStart(2, '0');
-            this.elements.datetimeVal.textContent = `${hh}:${mm}, ${cal.year} CE, ${cal.currentMonth.name}`;
-            this.elements.datetimeVal.className = '';
-        }
+        this.updateClock(now);
 
         if (this.elements.activeTalent) {
             this.elements.activeTalent.textContent = dn.activePerkTitle;
@@ -342,7 +407,7 @@ const DateSeasonsPage = {
         }
 
         if (this.elements.seasonName) {
-            this.elements.seasonName.textContent = cal.currentMonth.name;
+            this.elements.seasonName.textContent = `${cal.currentMonth.name} (${cal.currentMonth.season})`;
             const seasonClass = `gradient-season-${cal.currentMonth.season.toLowerCase()}`;
             this.elements.seasonName.className = `event-gradient-text ds-season-name ${seasonClass}`;
         }
@@ -365,6 +430,7 @@ if (typeof window !== 'undefined') {
     window.SEASON_WORLD_CHANGES = SEASON_WORLD_CHANGES;
     window.DAY_STAGES = DAY_STAGES;
 }
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         DateSeasonsPage,

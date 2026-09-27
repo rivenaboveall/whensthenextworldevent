@@ -1,9 +1,13 @@
 {
   "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
   "files.exclude": {
-    "**/venv": true
+    "**/venv": true,
+    "**/.venv": true,
+    "**/__pycache__": true
   },
   "files.watcherExclude": {
-    "**/venv/**": true
+    "**/venv/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__": true
   }
 }

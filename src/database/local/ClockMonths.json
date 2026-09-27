@@ -1,0 +1,50 @@
+[
+    {
+        "number": 1,
+        "name": "Hearthspan",
+        "season": "Spring",
+        "suffix": "-span"
+    },
+    {
+        "number": 2,
+        "name": "Rootwatch",
+        "season": "Spring",
+        "suffix": "-watch"
+    },
+    {
+        "number": 3,
+        "name": "Seedspan",
+        "season": "Summer",
+        "suffix": "-span"
+    },
+    {
+        "number": 4,
+        "name": "Bloomfall",
+        "season": "Summer",
+        "suffix": "-fall"
+    },
+    {
+        "number": 5,
+        "name": "Scythespan",
+        "season": "Autumn",
+        "suffix": "-span"
+    },
+    {
+        "number": 6,
+        "name": "Ardfall",
+        "season": "Autumn",
+        "suffix": "-fall"
+    },
+    {
+        "number": 7,
+        "name": "Saltspan",
+        "season": "Winter",
+        "suffix": "-span"
+    },
+    {
+        "number": 8,
+        "name": "Rimefall",
+        "season": "Winter",
+        "suffix": "-fall"
+    }
+]

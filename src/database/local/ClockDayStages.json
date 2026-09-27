@@ -1,0 +1,83 @@
+[
+    {
+        "name": "Nighttime",
+        "displayName": "Nighttime",
+        "startMin": 0,
+        "endMin": 5,
+        "nextStage": "Dawn",
+        "talent": "Dark Hours",
+        "styleClass": "night"
+    },
+    {
+        "name": "Dawn",
+        "displayName": "Nighttime (Dawn)",
+        "startMin": 5,
+        "endMin": 10,
+        "nextStage": "Daytime",
+        "talent": "Dark Hours",
+        "styleClass": "dawn"
+    },
+    {
+        "name": "Dawn",
+        "displayName": "Daytime (Dawn)",
+        "startMin": 10,
+        "endMin": 15,
+        "nextStage": "Morning",
+        "talent": "Praise the Sun",
+        "styleClass": "morning"
+    },
+    {
+        "name": "Morning",
+        "displayName": "Daytime (Morning)",
+        "startMin": 15,
+        "endMin": 20,
+        "nextStage": "Midday",
+        "talent": "Praise the Sun",
+        "styleClass": "morning"
+    },
+    {
+        "name": "Midday",
+        "displayName": "Daytime (Midday)",
+        "startMin": 20,
+        "endMin": 40,
+        "nextStage": "Afternoon",
+        "talent": "Praise the Sun",
+        "styleClass": "day"
+    },
+    {
+        "name": "Afternoon",
+        "displayName": "Daytime (Afternoon)",
+        "startMin": 40,
+        "endMin": 45,
+        "nextStage": "Dusk",
+        "talent": "Praise the Sun",
+        "styleClass": "afternoon"
+    },
+    {
+        "name": "Dusk",
+        "displayName": "Daytime (Dusk)",
+        "startMin": 45,
+        "endMin": 50,
+        "nextStage": "Nighttime",
+        "talent": "Praise the Sun",
+        "styleClass": "afternoon"
+    },
+    {
+        "name": "Dusk",
+        "displayName": "Nighttime (Dusk)",
+        "startMin": 50,
+        "endMin": 55,
+        "nextStage": "Nighttime",
+        "talent": "Dark Hours",
+        "styleClass": "dusk"
+    },
+    {
+        "name": "Nighttime",
+        "displayName": "Nighttime",
+        "startMin": 55,
+        "endMin": 60,
+        "nextStage": "Dawn",
+        "talent": "Dark Hours",
+        "styleClass": "night"
+    }
+]

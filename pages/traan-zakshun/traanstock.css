@@ -19,9 +19,16 @@
 .traan-header-row {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-end;
   width: 100%;
   padding: 0 0.25rem;
+  gap: 1rem;
+}
+
+.traan-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .traan-shop-title {
@@ -32,6 +39,16 @@
   margin: 0;
   letter-spacing: 0.4px;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+}
+
+.traan-stock-updated {
+  font-family: 'Montserrat', sans-serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(237, 231, 222, 0.7);
+  margin-top: 0.15rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.2px;
 }
 
 .traan-stock-timer {
@@ -64,6 +81,8 @@
 }
 
 .traan-item-card {
+  text-decoration: none;
+  color: inherit;
   background: rgba(14, 16, 22, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -78,9 +97,21 @@
   box-sizing: border-box;
 }
 
+.traan-item-card.has-wiki-link {
+  cursor: pointer;
+}
+
 .traan-item-card:hover {
   border-color: rgba(200, 163, 85, 0.45);
   background: rgba(24, 27, 36, 0.8);
+}
+
+.traan-item-card.has-wiki-link:hover {
+  border-color: rgba(200, 163, 85, 0.65);
+}
+
+.traan-item-card.has-wiki-link:hover .traan-item-name {
+  color: #dfb76c;
 }
 
 .traan-item-left {
@@ -181,6 +212,7 @@
   margin: 0;
   line-height: 1.25;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  transition: color 0.2s ease;
 }
 
 .traan-item-category {
@@ -231,6 +263,16 @@
   }
 
   .traan-item-card {
+    grid-column: auto !important;
+    grid-row: auto !important;
     padding: 0.75rem 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .traan-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
   }
 }

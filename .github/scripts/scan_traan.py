@@ -1,15 +1,18 @@
 import os
+import datetime
 import sys
 import json
 import re
 import urllib.request
 import urllib.error
 import difflib
+import argparse
+import shutil
 from PIL import Image, ImageOps
 from paddleocr import PaddleOCR
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(script_dir)
+project_root = os.path.dirname(os.path.dirname(script_dir))
 
 def load_env_file(filepath=".env"):
     if not os.path.exists(filepath):
@@ -40,87 +43,138 @@ if sys.platform == "win32":
             except Exception:
                 pass
 
-upstash_url = os.environ.get("UPSTASH_REDIS_REST_URL")
-upstash_token = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
-if not upstash_url or not upstash_token:
-    sys.exit("missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN")
-
-ITEM_DATABASE = None
+items_path = os.path.join(project_root, "src", "database", "local", "TraanAllItems.json")
 try:
-    req_db = urllib.request.Request(
-        f"{upstash_url}/json.get/TRAAN_ALLITEMS",
-        headers={"Authorization": f"Bearer {upstash_token}"}
-    )
-    with urllib.request.urlopen(req_db, timeout=10) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-        raw = data.get("result")
-        ITEM_DATABASE = json.loads(raw) if isinstance(raw, str) else raw
+    with open(items_path, "r", encoding="utf-8") as f:
+        ITEM_DATABASE = json.load(f)
 except Exception as e:
-    sys.exit(f"Failed to fetch item database from Upstash: {e}")
+    sys.exit(f"Failed to load item database from {items_path}: {e}")
 
 if not ITEM_DATABASE:
     sys.exit("Item database is empty or unavailable.")
 
-TOKEN = os.environ.get("DISCORD_TOKEN")
-CHANNEL_ID = os.environ.get("CHANNEL_ID")
+parser = argparse.ArgumentParser()
+parser.add_argument("input", nargs="?", default=None)
+parser.add_argument("--dry-run", action="store_true")
+args = parser.parse_args()
 
-if not TOKEN or not CHANNEL_ID:
-    sys.exit("missing DISCORD_TOKEN or CHANNEL_ID, somehow")
-
-url = f"https://discord.com/api/v10/channels/{CHANNEL_ID}/messages?limit=3"
-req = urllib.request.Request(
-    url,
-    headers={
-        "Authorization": f"Bot {TOKEN}",
-        "User-Agent": "DiscordBot (https://github.com, 1.0)"
-    }
-)
-
-try:
-    with urllib.request.urlopen(req) as resp:
-        messages = json.loads(resp.read().decode())
-except urllib.error.HTTPError as err:
-    sys.exit(f"api err: {err.code} - {err.reason}")
-
-messages.sort(key=lambda m: int(m["id"]), reverse=True)
-
-def extract_image_url(message):
-    for att in message.get("attachments", []):
-        ctype = att.get("content_type", "")
-        fname = att.get("filename", "").lower()
-        if ctype.startswith("image/") or fname.endswith((".png", ".jpg", ".jpeg", ".webp")):
-            return att.get("url")
-
-    for embed in message.get("embeds", []):
-        if "image" in embed and "url" in embed["image"]:
-            return embed["image"]["url"]
-        if "thumbnail" in embed and "url" in embed["thumbnail"]:
-            return embed["thumbnail"]["url"]
-
+def extract_image_url(data):
+    if isinstance(data, list):
+        for item in data:
+            found = extract_image_url(item)
+            if found:
+                return found
+        return None
+    if isinstance(data, dict):
+        for att in data.get("attachments", []):
+            ctype = att.get("content_type", "")
+            fname = att.get("filename", "").lower()
+            if ctype.startswith("image/") or fname.endswith((".png", ".jpg", ".jpeg", ".webp")):
+                if "url" in att:
+                    return att["url"]
+        for embed in data.get("embeds", []):
+            found = extract_image_url(embed)
+            if found:
+                return found
+        if "image" in data and isinstance(data["image"], dict) and "url" in data["image"]:
+            return data["image"]["url"]
+        if "thumbnail" in data and isinstance(data["thumbnail"], dict) and "url" in data["thumbnail"]:
+            return data["thumbnail"]["url"]
+        if "url" in data and isinstance(data["url"], str) and data["url"].startswith(("http://", "https://")):
+            return data["url"]
     return None
 
+def resolve_input_target(input_val):
+    if not input_val:
+        return None, None
+    raw = input_val.strip()
+    if not raw:
+        return None, None
+    if os.path.isfile(raw):
+        lower = raw.lower()
+        if lower.endswith((".png", ".jpg", ".jpeg", ".webp")):
+            return None, os.path.abspath(raw)
+        try:
+            with open(raw, "r", encoding="utf-8") as f:
+                parsed = json.load(f)
+            url = extract_image_url(parsed)
+            if url:
+                return url, None
+        except Exception:
+            pass
+    if (raw.startswith("{") and raw.endswith("}")) or (raw.startswith("[") and raw.endswith("]")):
+        try:
+            parsed = json.loads(raw)
+            url = extract_image_url(parsed)
+            if url:
+                return url, None
+        except Exception:
+            pass
+    if raw.startswith(("http://", "https://")):
+        return raw, None
+    match = re.search(r"https?://[^\s'\"<>\)]+", raw)
+    if match:
+        return match.group(0), None
+    return None, None
+
 target_image_url = None
+local_image_file = None
 target_message = None
 
-for msg in messages:
-    img_url = extract_image_url(msg)
-    if img_url:
-        target_image_url = img_url
-        target_message = msg
-        break
+if args.input:
+    target_image_url, local_image_file = resolve_input_target(args.input)
+    if not target_image_url and not local_image_file:
+        sys.exit(f"Could not resolve image URL or file from input: {args.input}")
+    target_message = {"id": "local_test", "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()}
+else:
+    TOKEN = os.environ.get("DISCORD_TOKEN")
+    CHANNEL_ID = os.environ.get("CHANNEL_ID")
 
-if not target_image_url:
-    print("no images found in the last 3 messages, please stop yapping")
-    sys.exit(0)
+    if not TOKEN or not CHANNEL_ID:
+        sys.exit("missing DISCORD_TOKEN or CHANNEL_ID, somehow")
 
-temp_img_path = "temp_scan.png"
+    url = f"https://discord.com/api/v10/channels/{CHANNEL_ID}/messages?limit=3"
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Authorization": f"Bot {TOKEN}",
+            "User-Agent": "DiscordBot (https://github.com, 1.0)"
+        }
+    )
 
-img_req = urllib.request.Request(
-    target_image_url,
-    headers={"User-Agent": "Mozilla/5.0"}
-)
-with urllib.request.urlopen(img_req) as response, open(temp_img_path, "wb") as out_file:
-    out_file.write(response.read())
+    try:
+        with urllib.request.urlopen(req) as resp:
+            messages = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as err:
+        sys.exit(f"api err: {err.code} - {err.reason}")
+
+    messages.sort(key=lambda m: int(m["id"]), reverse=True)
+
+    for msg in messages:
+        img_url = extract_image_url(msg)
+        if img_url:
+            target_image_url = img_url
+            target_message = msg
+            break
+
+    if not target_image_url:
+        print("no images found in the last 3 messages, please stop yapping")
+        sys.exit(0)
+
+temp_img_path = os.path.join(project_root, "temp_scan.png")
+
+if local_image_file:
+    shutil.copyfile(local_image_file, temp_img_path)
+elif target_image_url:
+    img_req = urllib.request.Request(
+        target_image_url,
+        headers={"User-Agent": "Mozilla/5.0"}
+    )
+    try:
+        with urllib.request.urlopen(img_req) as response, open(temp_img_path, "wb") as out_file:
+            out_file.write(response.read())
+    except Exception as e:
+        sys.exit(f"Failed to download image from {target_image_url}: {e}")
 
 def locate_shop_header(rec_texts, rec_boxes, img_height):
     for text, box in zip(rec_texts, rec_boxes):
@@ -156,13 +210,13 @@ def is_likely_item_title(text):
         return False
     return True
 
-def match_items_from_text(text_lines, shop_mode):
+def match_items_from_text(text_lines_with_boxes, shop_mode, img_height):
     catalog = ITEM_DATABASE.get(shop_mode, ITEM_DATABASE.get("stock", {}))
     detected_items = {}
 
-    filtered_lines = [line for line in text_lines if is_likely_item_title(line)]
+    filtered = [(text, box) for text, box in text_lines_with_boxes if is_likely_item_title(text)]
 
-    for raw_line in filtered_lines:
+    for raw_line, box in filtered:
         clean_line = re.sub(r"[^a-zA-Z0-9\s'-]", "", raw_line).strip()
         clean_line_low = clean_line.lower()
 
@@ -186,16 +240,43 @@ def match_items_from_text(text_lines, shop_mode):
                     "price": data["price"],
                     "currency": data["currency"],
                     "category": data["category"],
-                    "score": best_score
+                    "score": best_score,
+                    "min_x": box[0],
+                    "min_y": box[1]
                 }
 
-    sorted_items = sorted(detected_items.values(), key=lambda x: x["score"], reverse=True)[:8]
+    items_list = list(detected_items.values())
+    row_threshold = img_height * 0.06
+    items_list.sort(key=lambda x: x["min_y"])
+
+    rows = []
+    for item in items_list:
+        placed = False
+        for row in rows:
+            if abs(item["min_y"] - row[0]["min_y"]) <= row_threshold:
+                row.append(item)
+                placed = True
+                break
+        if not placed:
+            rows.append([item])
+
+    sorted_items = []
+    for row_idx, row in enumerate(rows):
+        row.sort(key=lambda x: x["min_x"])
+        for col_idx, item in enumerate(row):
+            item["storeYPosition"] = row_idx + 1
+            item["storeXPosition"] = col_idx + 1
+        sorted_items.extend(row)
+
+    sorted_items = sorted_items[:8]
 
     return [{
         "name": item["name"],
         "price": item["price"],
         "currency": item["currency"],
-        "category": item["category"]
+        "category": item["category"],
+        "storeXPosition": item["storeXPosition"],
+        "storeYPosition": item["storeYPosition"]
     } for item in sorted_items]
     
 try:
@@ -218,10 +299,10 @@ try:
         min_y = box[1]
         if header_y is not None and min_y <= header_y:
             continue
-        all_lines.append(text)
+        all_lines.append((text, box))
 
     active_mode = shop_type if shop_type else "stock"
-    items_found = match_items_from_text(all_lines, active_mode)
+    items_found = match_items_from_text(all_lines, active_mode, h)
 
     if not is_traan and len(items_found) >= 2:
         is_traan = True
@@ -234,14 +315,29 @@ try:
         "is_valid_traan": is_traan,
         "shop_type": shop_type,
         "image_url": target_image_url,
-        "message_id": target_message["id"],
+        "message_id": target_message["id"] if target_message else None,
         "stock_count": len(items_found),
         "items": items_found
     }
 
+    stock_date = target_message.get("timestamp") if target_message else None
+    stock_type_label = "Black" if shop_type == "cache" else "Normal"
+
+    items_dict = {
+        itm["name"]: {
+            "category": itm["category"],
+            "price": itm["price"],
+            "currency": itm["currency"],
+            "storeXPosition": itm["storeXPosition"],
+            "storeYPosition": itm["storeYPosition"]
+        }
+        for itm in items_found
+    }
+
     current_stock = {
-        "shop_type": shop_type,
-        "items": items_found
+        "stock_date": stock_date,
+        "stock_type": stock_type_label,
+        "items": items_dict
     }
 
     print(f"items: ({len(items_found)}):")
@@ -251,14 +347,14 @@ try:
 except Exception as e:
     print(f"OCR error: {e}", file=sys.stderr)
     result = {"found_image": True, "is_valid_traan": False, "items": []}
-    current_stock = {"shop_type": None, "items": []}
+    current_stock = {"stock_date": None, "stock_type": None, "items": {}}
 finally:
     if os.path.exists(temp_img_path):
         os.remove(temp_img_path)
 
 upstash_url = os.environ.get("UPSTASH_REDIS_REST_URL")
 upstash_token = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
-if upstash_url and upstash_token:
+if upstash_url and upstash_token and not args.dry_run:
     cmd = ["JSON.SET", "TRAAN_STOCK", "$", json.dumps(current_stock)]
     req_upstash = urllib.request.Request(
         upstash_url,

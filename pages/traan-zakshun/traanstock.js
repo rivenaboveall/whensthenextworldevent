@@ -83,12 +83,20 @@ const TRAAN_TOPICS = {
 };
 
 function resolveTraanTopic(items, siteData) {
-    if (!items || !items.length || !siteData) {
+    if (!items || !siteData) {
+        return null;
+    }
+
+    const itemList = Array.isArray(items)
+        ? items
+        : Object.entries(items).map(([name, item]) => ({ name, ...item }));
+
+    if (!itemList.length) {
         return null;
     }
 
     const counts = {};
-    for (const item of items) {
+    for (const item of itemList) {
         const info = siteData[item.name];
         const topic = info && info.Topic ? info.Topic.trim() : '';
         if (topic && TRAAN_TOPICS[topic]) {
@@ -129,6 +137,7 @@ function resolveTraanTopic(items, siteData) {
 const TraanStockLayout = {
     container: null,
     titleElement: null,
+    updatedElement: null,
     timerElement: null,
     gridElement: null,
     isMounted: false,
@@ -144,6 +153,7 @@ const TraanStockLayout = {
     init() {
         this.container = document.getElementById('traan-stock-layout');
         this.titleElement = document.getElementById('traan-stock-title');
+        this.updatedElement = document.getElementById('traan-stock-updated');
         this.timerElement = document.getElementById('traan-stock-timer');
         this.gridElement = document.getElementById('traan-stock-grid');
         this.fetchSiteData();
@@ -162,6 +172,7 @@ const TraanStockLayout = {
                 this.siteData = data;
                 this.isFetchingSiteData = false;
                 this.updateTopic();
+                this.renderStock();
                 return;
             }
         } catch (e) { }
@@ -232,7 +243,7 @@ const TraanStockLayout = {
 
         try {
             const data = await window.Database.getTraanStock();
-            if (data && Array.isArray(data.items)) {
+            if (data && data.items && (Array.isArray(data.items) || typeof data.items === 'object')) {
                 this.stockData = data;
                 this.lastFetchTime = now;
                 this.renderStock();
@@ -253,22 +264,77 @@ const TraanStockLayout = {
             return;
         }
 
-        if (this.titleElement && this.stockData && this.stockData.shop_type) {
-            this.titleElement.textContent = this.stockData.shop_type === 'cache'
-                ? "Traan's Black Market Cache"
-                : "Traan's Salvaged Stock";
+        if (this.titleElement && this.stockData) {
+            const isBlackMarket = this.stockData.stock_type === 'Black' || this.stockData.shop_type === 'cache';
+            if (this.stockData.stock_type || this.stockData.shop_type) {
+                this.titleElement.textContent = isBlackMarket
+                    ? "Traan's Black Market Cache"
+                    : "Traan's Salvaged Stock";
+            }
         }
 
-        if (!this.stockData || !this.stockData.items || this.stockData.items.length === 0) {
+        if (this.updatedElement) {
+            if (this.stockData && this.stockData.stock_date) {
+                try {
+                    const date = new Date(this.stockData.stock_date);
+                    if (!isNaN(date.getTime())) {
+                        const formatted = date.toLocaleString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        });
+                        this.updatedElement.textContent = `Last updated: ${formatted}`;
+                        this.updatedElement.style.display = '';
+                    } else {
+                        this.updatedElement.textContent = '';
+                        this.updatedElement.style.display = 'none';
+                    }
+                } catch {
+                    this.updatedElement.textContent = '';
+                    this.updatedElement.style.display = 'none';
+                }
+            } else {
+                this.updatedElement.textContent = '';
+                this.updatedElement.style.display = 'none';
+            }
+        }
+
+        const rawItems = this.stockData ? this.stockData.items : null;
+        let items = [];
+        if (Array.isArray(rawItems)) {
+            items = rawItems;
+        } else if (rawItems && typeof rawItems === 'object') {
+            items = Object.entries(rawItems).map(([name, item]) => ({
+                name,
+                ...item
+            }));
+        }
+
+        if (!items || items.length === 0) {
             this.gridElement.innerHTML = '<div class="traan-stock-empty">No stock currently available.</div>';
             return;
         }
 
-        const itemsHtml = this.stockData.items.map((item) => {
+        items.sort((a, b) => {
+            const yDiff = (a.storeYPosition || 0) - (b.storeYPosition || 0);
+            if (yDiff !== 0) return yDiff;
+            return (a.storeXPosition || 0) - (b.storeXPosition || 0);
+        });
+
+        const itemsHtml = items.map((item) => {
             const currencyIcon = item.currency === 'Crowns' ? 'Crowns.webp' : 'Notes.webp';
             const categoryHtml = item.category ? `<span class="traan-item-category">${item.category}</span>` : '';
+            const metadata = this.siteData && (this.siteData[item.name] || this.siteData[item.name.trim()]);
+            const wikiUrl = metadata && metadata.WikiPage ? metadata.WikiPage : null;
+            const tag = wikiUrl ? 'a' : 'div';
+            const linkAttrs = wikiUrl ? `href="${wikiUrl}" target="_blank" rel="noopener noreferrer"` : '';
+            const gridStyle = (item.storeXPosition && item.storeYPosition)
+                ? `style="grid-column: ${item.storeXPosition}; grid-row: ${item.storeYPosition};"`
+                : '';
+
             return `
-                <div class="traan-item-card">
+                <${tag} ${linkAttrs} class="traan-item-card${wikiUrl ? ' has-wiki-link' : ''}" ${gridStyle}>
                     <div class="traan-item-left">
                         <div class="traan-item-icon-box">
                             <span class="traan-corner tl"></span>
@@ -286,7 +352,7 @@ const TraanStockLayout = {
                         <h3 class="traan-item-name">${item.name}</h3>
                         ${categoryHtml}
                     </div>
-                </div>
+                </${tag}>
             `;
         }).join('');
 

@@ -3,7 +3,15 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="When's the next World Event?">
+  <meta property="og:description"
+    content="Live tracker for Deepwoken World Events (including Etrean Luminant Disasters), Traan Zakshun's market rotations and Date and Season Updates.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Live tracker for Deepwoken World Events (including Etrean Luminant Disasters), Traan Zakshun's market rotations and Date and Season Updates.">
+  <meta name="theme-color" content="#0b0f17">
+
   <script>
     (function () {
       var path = window.location.pathname;
@@ -14,7 +22,9 @@
   <title>when's the next world event?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+    rel="stylesheet">
   <link rel="preload" as="image" href="assets/images/Traan.webp">
   <link rel="preload" as="image" href="assets/images/BattleRoyale.webp">
   <link rel="preload" as="image" href="assets/images/Carnival.webp">
@@ -25,16 +35,13 @@
   <link rel="preload" as="image" href="assets/images/Seasons/Summer.webp">
   <link rel="preload" as="image" href="assets/images/Seasons/Autumn.webp">
   <link rel="preload" as="image" href="assets/images/Seasons/Winter.webp">
-  <meta name="description"
-    content="Live countdown tracker for Deepwoken World Events, Etrean Luminant Disasters, Traan Zakshun's market rotations and Date and Season Updates.">
-  <meta name="theme-color" content="#0b0f17">
   <link rel="icon" type="image/webp" href="assets/icons/ItemImage.webp">
   <link rel="stylesheet" href="src/styles/base.css?v=2">
-  <link rel="stylesheet" href="src/styles/header.css?v=3">
+  <link rel="stylesheet" href="src/styles/header.css?v=4">
   <link rel="stylesheet" href="src/styles/tooltip.css?v=2">
-  <link rel="stylesheet" href="pages/world-events/worldevents.css?v=2">
-  <link rel="stylesheet" href="pages/traan-zakshun/traanstock.css?v=2">
-  <link rel="stylesheet" href="pages/date-seasons/dateseasons.css?v=12">
+  <link rel="stylesheet" href="pages/world-events/worldevents.css?v=4">
+  <link rel="stylesheet" href="pages/traan-zakshun/traanstock.css?v=7">
+  <link rel="stylesheet" href="pages/date-seasons/dateseasons.css?v=14">
 </head>
 
 <body>
@@ -62,7 +69,7 @@
 
       <button id="test-event-btn" class="nav-btn test-event-btn layout-hidden" type="button"
         data-hover-text="Test transition to the next World Event (Localhost only)">
-        Test Event
+        Skip Time
       </button>
 
       <div id="side-menu-dropdown" class="menu-dropdown layout-hidden" role="menu">
@@ -91,6 +98,15 @@
             <span id="menu-remind-traan-status" class="menu-item-status">Off</span>
           </button>
           <button id="menu-item-mute-soundtrack-traan" class="menu-item menu-item-soundtrack" type="button"
+            role="menuitem"
+            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
+            <span class="menu-item-text">Mute Soundtrack</span>
+            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
+          </button>
+        </div>
+
+        <div id="menu-group-dateseasons" class="menu-group layout-hidden">
+          <button id="menu-item-mute-soundtrack-dateseasons" class="menu-item menu-item-soundtrack" type="button"
             role="menuitem"
             data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
             <span class="menu-item-text">Mute Soundtrack</span>
@@ -164,7 +180,10 @@
     <section id="traan-stock-layout" class="traan-layout layout-hidden" aria-label="Traan Zakshun Stock">
       <div class="traan-shop-container">
         <div class="traan-header-row">
-          <h2 id="traan-stock-title" class="traan-shop-title">Traan's Salvaged Stock</h2>
+          <div class="traan-title-group">
+            <h2 id="traan-stock-title" class="traan-shop-title">Traan's Salvaged Stock</h2>
+            <div id="traan-stock-updated" class="traan-stock-updated"></div>
+          </div>
           <div id="traan-stock-timer" class="traan-stock-timer">Next <strong>Black Market</strong> in --</div>
         </div>
         <div class="traan-header-divider"></div>
@@ -173,7 +192,7 @@
     </section>
     <section id="date-seasons-layout" class="date-seasons-layout layout-hidden" aria-label="Current Date and Season">
       <div class="ds-datetime-badge">
-        <span id="ds-datetime-val">--:--, ---- CE, -------</span>
+        <span id="ds-datetime-val">--:--:--, ---- CE, -------</span>
       </div>
 
       <div class="date-seasons-center-column">
@@ -198,7 +217,7 @@
       <div class="ds-season-container">
         <div class="ds-season-header">
           Current season is <span id="ds-season-name"
-            class="event-gradient-text ds-season-name gradient-season-autumn">Ardfall</span>
+            class="event-gradient-text ds-season-name gradient-season-autumn">Ardfall (Autumn)</span>
         </div>
         <div class="ds-season-changes-card" id="ds-season-changes-card">
           <ul class="ds-season-changes-list" id="ds-season-changes-list"></ul>
@@ -233,12 +252,12 @@
   <div id="cursor-hover-box" class="cursor-hover-box" aria-hidden="true"></div>
 
   <script src="src/clock.js?v=1"></script>
-  <script src="src/database.js?v=1"></script>
-  <script src="pages/world-events/worldevents.js?v=8"></script>
-  <script src="pages/traan-zakshun/traanstock.js?v=14"></script>
-  <script src="pages/date-seasons/dateseasons.js?v=13"></script>
-  <script src="src/musicplayer.js?v=9"></script>
-  <script src="src/main.js?v=8"></script>
+  <script src="src/database/database.js?v=1"></script>
+  <script src="pages/world-events/worldevents.js?v=10"></script>
+  <script src="pages/traan-zakshun/traanstock.js?v=17"></script>
+  <script src="pages/date-seasons/dateseasons.js?v=16"></script>
+  <script src="src/musicplayer.js?v=20"></script>
+  <script src="src/main.js?v=20"></script>
 </body>
 
 </html>

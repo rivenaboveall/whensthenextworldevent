@@ -4,28 +4,8 @@ const DeepwokenClock = {
     anchorMonthIndex: 5,
     dayMs: 24 * 60 * 60 * 1000,
 
-    months: [
-        { number: 1, name: 'Hearthspan', season: 'Spring', suffix: '-span' },
-        { number: 2, name: 'Rootwatch', season: 'Spring', suffix: '-watch' },
-        { number: 3, name: 'Seedspan', season: 'Summer', suffix: '-span' },
-        { number: 4, name: 'Bloomfall', season: 'Summer', suffix: '-fall' },
-        { number: 5, name: 'Scythespan', season: 'Autumn', suffix: '-span' },
-        { number: 6, name: 'Ardfall', season: 'Autumn', suffix: '-fall' },
-        { number: 7, name: 'Saltspan', season: 'Winter', suffix: '-span' },
-        { number: 8, name: 'Rimefall', season: 'Winter', suffix: '-fall' }
-    ],
-
-    dayStages: [
-        { name: 'Nighttime', displayName: 'Nighttime', startMin: 0, endMin: 5, nextStage: 'Dawn', talent: 'Dark Hours', styleClass: 'night' },
-        { name: 'Dawn', displayName: 'Nighttime (Dawn)', startMin: 5, endMin: 10, nextStage: 'Daytime', talent: 'Dark Hours', styleClass: 'dawn' },
-        { name: 'Dawn', displayName: 'Daytime (Dawn)', startMin: 10, endMin: 15, nextStage: 'Morning', talent: 'Praise the Sun', styleClass: 'morning' },
-        { name: 'Morning', displayName: 'Daytime (Morning)', startMin: 15, endMin: 20, nextStage: 'Midday', talent: 'Praise the Sun', styleClass: 'morning' },
-        { name: 'Midday', displayName: 'Daytime (Midday)', startMin: 20, endMin: 40, nextStage: 'Afternoon', talent: 'Praise the Sun', styleClass: 'day' },
-        { name: 'Afternoon', displayName: 'Daytime (Afternoon)', startMin: 40, endMin: 45, nextStage: 'Dusk', talent: 'Praise the Sun', styleClass: 'afternoon' },
-        { name: 'Dusk', displayName: 'Daytime (Dusk)', startMin: 45, endMin: 50, nextStage: 'Nighttime', talent: 'Praise the Sun', styleClass: 'afternoon' },
-        { name: 'Dusk', displayName: 'Nighttime (Dusk)', startMin: 50, endMin: 55, nextStage: 'Nighttime', talent: 'Dark Hours', styleClass: 'dusk' },
-        { name: 'Nighttime', displayName: 'Nighttime', startMin: 55, endMin: 60, nextStage: 'Dawn', talent: 'Dark Hours', styleClass: 'night' }
-    ],
+    months: window.Database.getClockMonths(),
+    dayStages: window.Database.getDayStages(),
 
     getDayNightStatus(timestamp) {
         const d = new Date(timestamp);
@@ -135,41 +115,8 @@ const WorldEventClock = {
     disasterIntervalMs: 60 * 60 * 1000,
     joinWindowMs: 5 * 60 * 1000,
 
-    worldEvents: [
-        {
-            name: 'Battle Royale',
-            gradientClass: 'gradient-battle-royale',
-            textGlowClass: 'text-glow-battle-royale',
-            bgImage: 'assets/images/BattleRoyale.webp'
-        },
-        {
-            name: 'Carnival of Hearts',
-            gradientClass: 'gradient-carnival',
-            textGlowClass: 'text-glow-carnival',
-            bgImage: 'assets/images/Carnival.webp'
-        },
-        {
-            name: 'Interluminary Interloper',
-            gradientClass: 'gradient-interluminary',
-            textGlowClass: 'text-glow-interluminary',
-            bgImage: 'assets/images/Parasol.webp'
-        }
-    ],
-
-    disasters: [
-        {
-            name: 'Cinders of Etris',
-            gradientClass: 'disaster-gradient-etris',
-            textGlowClass: 'text-glow-etris',
-            bgImage: 'assets/images/CindersOfEtris.webp'
-        },
-        {
-            name: 'Doom of Caeranthil',
-            gradientClass: 'disaster-gradient-caeranthil',
-            textGlowClass: 'text-glow-caeranthil',
-            bgImage: 'assets/images/Caeranthil.webp'
-        }
-    ],
+    worldEvents: window.Database.getWorldEvents(),
+    disasters: window.Database.getDisasters(),
 
     getWorldEventAtTimestamp(timestamp) {
         const diff = timestamp - this.worldAnchorTimestamp;

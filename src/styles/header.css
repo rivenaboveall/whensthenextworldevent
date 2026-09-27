@@ -50,11 +50,6 @@
 .nav-btn:hover {
   background: var(--btn-hover-bg);
   box-shadow: 0 0 16px var(--btn-active-glow);
-  transform: translateY(-1px);
-}
-
-.nav-btn:active {
-  transform: translateY(0);
 }
 
 .nav-btn:focus,

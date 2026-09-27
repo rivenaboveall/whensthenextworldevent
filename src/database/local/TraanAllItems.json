@@ -1,0 +1,671 @@
+{
+    "cache": {
+        "Aazel's Horns": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Allure Enchant Grease": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Ardour Manifestation": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Armorer's Needle": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Astral Enchant Stone": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 10
+        },
+        "Bluster Enchant Stone": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Boltcrusher": {
+            "category": "Legendary Heavy Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Brilliant Cape": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Broken Gatling Gun": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Celtorian Tideknight": {
+            "category": "Outfit Schematics",
+            "currency": "Crowns",
+            "price": 45
+        },
+        "Champion's Alloy": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 38
+        },
+        "Charged Parasol Part": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 38
+        },
+        "Crimson Terrapod Shell": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 8
+        },
+        "Crypt Blade": {
+            "category": "Legendary Heavy Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Curse of Ysley's Ember Enchant Stone": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Curved Blade of Winds": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Dark Pearls": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 30
+        },
+        "Darkened Bastion": {
+            "category": "Outfit Schematics",
+            "currency": "Crowns",
+            "price": 25
+        },
+        "Deconstruction of Shrine": {
+            "category": "Shield",
+            "currency": "Crowns",
+            "price": 10
+        },
+        "Doom of Caeranthil's Scale": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 30
+        },
+        "Dormant Splinter": {
+            "category": "honestly just a crafting material",
+            "currency": "Crowns",
+            "price": 35
+        },
+        "Dread Serpent's Mane": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Dread Serpent's Tooth": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 7
+        },
+        "Drowned Enchant Grease": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Egg": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Ethereal Osseous Plate": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 20
+        },
+        "First Light": {
+            "category": "Weapons",
+            "currency": "Crowns",
+            "price": 8
+        },
+        "Forge Needle": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Frost Essence": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 20
+        },
+        "Gale Essence": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 20
+        },
+        "Gilded Needle": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Glumfig": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Goodie Bag": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 2
+        },
+        "Hemobloom": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Hero's Blade of Flame": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 3
+        },
+        "Hero's Blade of Frost": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 3
+        },
+        "Hero's Blade of Lightning": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 3
+        },
+        "Hero's Blade of Shadow": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 3
+        },
+        "Hero's Blade of Wind": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 3
+        },
+        "Idol of Yun'Shul": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Imperator's Edge": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Jadeite Megalodaunt": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 30
+        },
+        "Kindred Edict": {
+            "category": "Weapons",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Lightkeeper's Medallion": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Moonseye Tome": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Nautilodaunt Beak": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 7
+        },
+        "Parasol Membrane": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 15
+        },
+        "Plumfruit Muffin": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Rain Spire": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Red Death": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Shiva's Codex": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 7
+        },
+        "Simmerbloom Diadem": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 15
+        },
+        "Sinner's Ash": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 6
+        },
+        "Smith's Alloy": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 3
+        },
+        "Soulthorn": {
+            "category": "Medium Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Stench Enchant Grease": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Stone Enchant Stone": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Stormseye": {
+            "category": "Legendary Medium Weapon",
+            "currency": "Crowns",
+            "price": 4
+        },
+        "Terrapod Shell": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Tiran Pendant": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Trickster Dust": {
+            "category": "Relic",
+            "currency": "Crowns",
+            "price": 7
+        },
+        "Umbral Candle": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Vampirism Enchant Stone": {
+            "category": "Enchant",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Void Spire": {
+            "category": "Miscellaneous",
+            "currency": "Crowns",
+            "price": 1
+        },
+        "Warmaster's Medallion": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 5
+        },
+        "Whistling Periapt": {
+            "category": "Equipment",
+            "currency": "Crowns",
+            "price": 175
+        },
+        "Wraithclaw": {
+            "category": "Legendary Light Weapon",
+            "currency": "Crowns",
+            "price": 3
+        }
+    },
+    "stock": {
+        "11th Legion Plate": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Adretian Axe": {
+            "category": "Heavy Weapon",
+            "currency": "Notes",
+            "price": 300
+        },
+        "Alloyed Falchion": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 650
+        },
+        "Alloyed Scalesplitter": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 650
+        },
+        "Authority Captain Uniform": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Authority Peacekeeper Armor": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Bejeweled Clip": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Bronze Aspis": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 100
+        },
+        "Brow Stud": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Carefree Garments": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Cerulean Gown": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Cloak of Winds": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Crescendo": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 1250
+        },
+        "Darkalloy Greatsword": {
+            "category": "Heavy Weapon",
+            "currency": "Notes",
+            "price": 650
+        },
+        "Dermal Stud": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Diver Apprentice Robes": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Diver Journeyman Robes": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Dye Packet": {
+            "category": "Miscellaneous",
+            "currency": "Notes",
+            "price": 1000
+        },
+        "Eager Tradesman": {
+            "category": "Starter Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Evanspear Greataxe": {
+            "category": "Heavy Weapon",
+            "currency": "Notes",
+            "price": 1250
+        },
+        "Flame Worshipper Armor": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Frigid Prism": {
+            "category": "Miscellaneous",
+            "currency": "Notes",
+            "price": 100
+        },
+        "Gale Stone": {
+            "category": "Miscellaneous",
+            "currency": "Notes",
+            "price": 100
+        },
+        "Glumfig": {
+            "category": "Miscellaneous",
+            "currency": "Notes",
+            "price": 2500
+        },
+        "Goodie Bag": {
+            "category": "Miscellaneous",
+            "currency": "Notes",
+            "price": 15000
+        },
+        "Heartstar": {
+            "category": "Miscellaneous",
+            "currency": "Notes",
+            "price": 100
+        },
+        "Hero's Blade of Flame": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 4500
+        },
+        "Hero's Blade of Lightning": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 4500
+        },
+        "Hero's Blade of Shadow": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 4500
+        },
+        "Hired Mercenary": {
+            "category": "Starter Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Hive Drone": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Hive Tactician Armor": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Ignition Trailblazer": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Ignition Union Uniform": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Katana": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 300
+        },
+        "Keeper": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 80
+        },
+        "Krulian Knife": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 1000
+        },
+        "Legion Centurion": {
+            "category": "Master Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Merchant Robes": {
+            "category": "Starter Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Moon Brow Rings": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Moon Dermal Rings": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Moon Lip Ring": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Moon Septum Ring": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Navaen Nomad Robes": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Needle's Eye": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 500
+        },
+        "Night Axe": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 5000
+        },
+        "Nose Stud": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Pathfinder Cloak": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Pathfinder Sorcerer": {
+            "category": "Starter Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Pathfinder Thaumaturge": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Prophet's Cloak": {
+            "category": "Master Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Rifle Spear": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 650
+        },
+        "Sailor's Fleece": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 100
+        },
+        "Scholar": {
+            "category": "Starter Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Scoundrel's Saber": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 650
+        },
+        "Seamstress's Attire": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Serrated Warspear": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 650
+        },
+        "Snakebite Studs": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 35
+        },
+        "Summer Company Uniform": {
+            "category": "Adept Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "True Seraph Spear": {
+            "category": "Weapons",
+            "currency": "Notes",
+            "price": 750
+        },
+        "Varicosan Finery": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Vigil Longsword": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 300
+        },
+        "Warden Ceremonial Sword": {
+            "category": "Medium Weapon",
+            "currency": "Notes",
+            "price": 300
+        },
+        "Whaler Coat": {
+            "category": "Expert Outfit",
+            "currency": "Notes",
+            "price": 200
+        },
+        "Whaling Knife": {
+            "category": "Light Weapon",
+            "currency": "Notes",
+            "price": 300
+        },
+        "Wool Beret": {
+            "category": "Equipment",
+            "currency": "Notes",
+            "price": 55
+        }
+    }
+}
