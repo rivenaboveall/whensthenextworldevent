@@ -137,6 +137,13 @@
   width: 100%;
 }
 
+.menu-separator {
+  height: 1px;
+  background: var(--panel-border);
+  margin: 0.25rem 0.4rem;
+  flex-shrink: 0;
+}
+
 .menu-item {
   display: flex;
   justify-content: space-between;

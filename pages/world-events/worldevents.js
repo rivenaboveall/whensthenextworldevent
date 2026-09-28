@@ -317,13 +317,14 @@ const WorldEventsLayout = {
     },
 
     transitionToBackground(nextWorldBg, nextDisasterBg) {
-        if (!this.bgCurtainElement) {
+        if (!this.bgCurtainElement || (window.isAnimationsDisabled && window.isAnimationsDisabled())) {
             if (nextWorldBg && this.bgImageElement) {
                 this.bgImageElement.style.backgroundImage = `url("${nextWorldBg}")`;
             }
             if (nextDisasterBg && this.bgImageDisasterElement) {
                 this.bgImageDisasterElement.style.backgroundImage = `url("${nextDisasterBg}")`;
             }
+            this.isTransitioningBg = false;
             return;
         }
 

@@ -36,11 +36,11 @@
   <link rel="preload" as="image" href="assets/images/Seasons/Autumn.webp">
   <link rel="preload" as="image" href="assets/images/Seasons/Winter.webp">
   <link rel="icon" type="image/webp" href="assets/icons/ItemImage.webp">
-  <link rel="stylesheet" href="src/styles/base.css?v=2">
-  <link rel="stylesheet" href="src/styles/header.css?v=4">
+  <link rel="stylesheet" href="src/styles/base.css?v=3">
+  <link rel="stylesheet" href="src/styles/header.css?v=5">
   <link rel="stylesheet" href="src/styles/tooltip.css?v=2">
   <link rel="stylesheet" href="pages/world-events/worldevents.css?v=4">
-  <link rel="stylesheet" href="pages/traan-zakshun/traanstock.css?v=7">
+  <link rel="stylesheet" href="pages/traan-zakshun/traanstock.css?v=12">
   <link rel="stylesheet" href="pages/date-seasons/dateseasons.css?v=14">
 </head>
 
@@ -73,6 +73,21 @@
       </button>
 
       <div id="side-menu-dropdown" class="menu-dropdown layout-hidden" role="menu">
+        <div id="menu-group-global" class="menu-group">
+          <button id="menu-item-mute-soundtrack" class="menu-item menu-item-soundtrack" type="button" role="menuitem"
+            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
+            <span class="menu-item-text">Mute Soundtrack</span>
+            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
+          </button>
+          <button id="menu-item-animations" class="menu-item" type="button" role="menuitem"
+            data-hover-text="Globally disable background transitions, layout fades, and UI animations">
+            <span class="menu-item-text">Disable Animations</span>
+            <span id="menu-animations-status" class="menu-item-status">Off</span>
+          </button>
+        </div>
+
+        <div id="side-menu-separator" class="menu-separator" role="separator"></div>
+
         <div id="menu-group-worldevents" class="menu-group">
           <button id="menu-item-disasters" class="menu-item" type="button" role="menuitem"
             data-hover-text="Show Disasters happening in the Etrean Luminant along with the current World Events">
@@ -84,35 +99,22 @@
             <span class="menu-item-text">Remind Me (World Events)</span>
             <span id="menu-remind-we-status" class="menu-item-status">Off</span>
           </button>
-          <button id="menu-item-mute-soundtrack-we" class="menu-item menu-item-soundtrack" type="button" role="menuitem"
-            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
-            <span class="menu-item-text">Mute Soundtrack</span>
-            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
-          </button>
         </div>
 
         <div id="menu-group-traan" class="menu-group layout-hidden">
-          <button id="menu-item-remind-traan" class="menu-item" type="button" role="menuitem"
-            data-hover-text="Play a sound cue and a desktop notification when the next event happens.">
-            <span class="menu-item-text">Remind Me (Traan Zakshun)</span>
-            <span id="menu-remind-traan-status" class="menu-item-status">Off</span>
+          <button id="menu-item-traan-order" class="menu-item" type="button" role="menuitem"
+            data-hover-text="Toggle stock order between Name (alphabetical with themed items at top) and Literal (in-game screenshot coordinates)">
+            <span class="menu-item-text">Order Type</span>
+            <span id="menu-traan-order-status" class="menu-item-status">Literal</span>
           </button>
-          <button id="menu-item-mute-soundtrack-traan" class="menu-item menu-item-soundtrack" type="button"
-            role="menuitem"
-            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
-            <span class="menu-item-text">Mute Soundtrack</span>
-            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
+          <button id="menu-item-traan-theming" class="menu-item" type="button" role="menuitem"
+            data-hover-text="Disable custom stock themes, topic music, backgrounds, and item highlights">
+            <span class="menu-item-text">Disable Theming</span>
+            <span id="menu-traan-theming-status" class="menu-item-status">Off</span>
           </button>
         </div>
 
-        <div id="menu-group-dateseasons" class="menu-group layout-hidden">
-          <button id="menu-item-mute-soundtrack-dateseasons" class="menu-item menu-item-soundtrack" type="button"
-            role="menuitem"
-            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
-            <span class="menu-item-text">Mute Soundtrack</span>
-            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
-          </button>
-        </div>
+        <div id="menu-group-dateseasons" class="menu-group layout-hidden"></div>
       </div>
     </div>
     <div class="top-bar-right">
@@ -252,12 +254,12 @@
   <div id="cursor-hover-box" class="cursor-hover-box" aria-hidden="true"></div>
 
   <script src="src/clock.js?v=1"></script>
-  <script src="src/database/database.js?v=1"></script>
-  <script src="pages/world-events/worldevents.js?v=10"></script>
-  <script src="pages/traan-zakshun/traanstock.js?v=17"></script>
+  <script src="src/database/database.js?v=2"></script>
+  <script src="pages/world-events/worldevents.js?v=11"></script>
+  <script src="pages/traan-zakshun/traanstock.js?v=25"></script>
   <script src="pages/date-seasons/dateseasons.js?v=16"></script>
   <script src="src/musicplayer.js?v=20"></script>
-  <script src="src/main.js?v=20"></script>
+  <script src="src/main.js?v=23"></script>
 </body>
 
 </html>

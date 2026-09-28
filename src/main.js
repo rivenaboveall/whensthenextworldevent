@@ -1,13 +1,14 @@
 const burgerMenuBtn = document.getElementById('burger-menu-btn');
 const sideMenuDropdown = document.getElementById('side-menu-dropdown');
+const sideMenuSeparator = document.getElementById('side-menu-separator');
 const menuGroupWorldEvents = document.getElementById('menu-group-worldevents');
 const menuGroupTraan = document.getElementById('menu-group-traan');
 const menuGroupDateSeasons = document.getElementById('menu-group-dateseasons');
 
 const menuItemRemindWe = document.getElementById('menu-item-remind-we');
 const menuRemindWeStatus = document.getElementById('menu-remind-we-status');
-const menuItemRemindTraan = document.getElementById('menu-item-remind-traan');
-const menuRemindTraanStatus = document.getElementById('menu-remind-traan-status');
+const menuItemAnimations = document.getElementById('menu-item-animations');
+const menuAnimationsStatus = document.getElementById('menu-animations-status');
 const soundtrackButtons = document.querySelectorAll('.menu-item-soundtrack');
 const soundtrackStatuses = document.querySelectorAll('.menu-soundtrack-status');
 
@@ -34,6 +35,11 @@ let isRemindWE = localStorage.getItem('user_remind_we') === 'true';
 window.isRemindWEEnabled = () => isRemindWE;
 let isRemindTraan = localStorage.getItem('user_remind_traan') === 'true';
 let isSoundtrackMuted = localStorage.getItem('user_soundtrack_muted') === 'true';
+let isAnimationsDisabled = localStorage.getItem('user_disable_animations') === 'true';
+window.isAnimationsDisabled = () => isAnimationsDisabled;
+if (isAnimationsDisabled) {
+	document.body.classList.add('no-animations');
+}
 
 let lastWorldSlotIndex = null;
 let lastDisasterSlotIndex = null;
@@ -88,10 +94,6 @@ function updateReminderUI() {
 		menuRemindWeStatus.textContent = isRemindWE ? 'On' : 'Off';
 		menuRemindWeStatus.classList.toggle('status-active', isRemindWE);
 	}
-	if (menuRemindTraanStatus) {
-		menuRemindTraanStatus.textContent = isRemindTraan ? 'On' : 'Off';
-		menuRemindTraanStatus.classList.toggle('status-active', isRemindTraan);
-	}
 }
 
 function updateSoundtrackUI() {
@@ -100,6 +102,14 @@ function updateSoundtrackUI() {
 		statusEl.classList.toggle('status-muted', isSoundtrackMuted);
 		statusEl.classList.toggle('status-active', !isSoundtrackMuted);
 	});
+}
+
+function updateAnimationsUI() {
+	if (menuAnimationsStatus) {
+		menuAnimationsStatus.textContent = isAnimationsDisabled ? 'On' : 'Off';
+		menuAnimationsStatus.classList.toggle('status-active', isAnimationsDisabled);
+	}
+	document.body.classList.toggle('no-animations', isAnimationsDisabled);
 }
 
 function showDesktopNotification(title, body, icon) {
@@ -241,6 +251,12 @@ function updateMenuGroupVisibility() {
 	if (menuGroupDateSeasons) {
 		menuGroupDateSeasons.classList.toggle('layout-hidden', currentLayout !== 'dateseasons');
 	}
+	if (sideMenuSeparator) {
+		const hasPageSettings = (currentLayout === 'worldevents' && menuGroupWorldEvents && menuGroupWorldEvents.children.length > 0) ||
+			(currentLayout === 'traanstock' && menuGroupTraan && menuGroupTraan.children.length > 0) ||
+			(currentLayout === 'dateseasons' && menuGroupDateSeasons && menuGroupDateSeasons.children.length > 0);
+		sideMenuSeparator.classList.toggle('layout-hidden', !hasPageSettings);
+	}
 }
 
 let layoutTransitionTimeout = null;
@@ -288,6 +304,7 @@ function applyLayout(targetLayout, updateHistory = 'push') {
 
 	updateEventTypeUI();
 	updateMenuGroupVisibility();
+	updateDebugButton();
 
 	if (updateHistory === 'push') {
 		updateLayoutUrl(currentLayout, false);
@@ -298,7 +315,7 @@ function applyLayout(targetLayout, updateHistory = 'push') {
 
 function switchLayout(targetLayout, isInitial = false, updateHistory = 'push') {
 	const curtain = document.getElementById('bg-black-curtain');
-	if (isInitial || !curtain || currentLayout === targetLayout) {
+	if (isInitial || !curtain || currentLayout === targetLayout || isAnimationsDisabled) {
 		applyLayout(targetLayout, isInitial ? 'replace' : updateHistory);
 		if (curtain) {
 			curtain.classList.remove('fade-black');
@@ -412,17 +429,6 @@ if (menuItemRemindWe) {
 	});
 }
 
-if (menuItemRemindTraan) {
-	menuItemRemindTraan.addEventListener('click', () => {
-		isRemindTraan = !isRemindTraan;
-		localStorage.setItem('user_remind_traan', String(isRemindTraan));
-		if (isRemindTraan) {
-			requestNotificationPermission();
-		}
-		updateReminderUI();
-	});
-}
-
 soundtrackButtons.forEach((btn) => {
 	btn.addEventListener('click', () => {
 		isSoundtrackMuted = !isSoundtrackMuted;
@@ -433,6 +439,14 @@ soundtrackButtons.forEach((btn) => {
 		}
 	});
 });
+
+if (menuItemAnimations) {
+	menuItemAnimations.addEventListener('click', () => {
+		isAnimationsDisabled = !isAnimationsDisabled;
+		localStorage.setItem('user_disable_animations', String(isAnimationsDisabled));
+		updateAnimationsUI();
+	});
+}
 
 if (eventTypeBtn) {
 	eventTypeBtn.addEventListener('click', (e) => {
@@ -455,32 +469,66 @@ if (eventTypeItems) {
 
 const isLocalhost = window.location.hostname === 'localhost' ||
 	window.location.hostname === '127.0.0.1' ||
+	window.location.hostname === '0.0.0.0' ||
+	window.location.hostname.startsWith('192.168.') ||
+	window.location.hostname.startsWith('10.') ||
 	window.location.hostname === '';
 
-if (testEventBtn) {
-	if (isLocalhost) {
+function updateDebugButton() {
+	if (!testEventBtn) {
+		return;
+	}
+	if (!isLocalhost) {
+		testEventBtn.classList.add('layout-hidden');
+		return;
+	}
+
+	if (currentLayout === 'worldevents') {
 		testEventBtn.classList.remove('layout-hidden');
+		testEventBtn.textContent = 'Skip Time';
+		testEventBtn.setAttribute('data-hover-text', 'Test transition to the next World Event (Localhost only)');
+	} else if (currentLayout === 'traanstock') {
+		testEventBtn.classList.remove('layout-hidden');
+		testEventBtn.textContent = 'Randomize Stock';
+		testEventBtn.setAttribute('data-hover-text', "Randomize Traan's stock to test theming (Localhost only)");
 	} else {
 		testEventBtn.classList.add('layout-hidden');
 	}
 
+	if (cursorHoverBox && currentHoverTarget === testEventBtn) {
+		const newHoverText = testEventBtn.getAttribute('data-hover-text');
+		if (newHoverText) {
+			cursorHoverBox.textContent = newHoverText;
+		}
+	}
+}
+
+if (testEventBtn) {
+	updateDebugButton();
+
 	testEventBtn.addEventListener('click', () => {
-		const now = getAppTime();
-		const currentWorld = getWorldEventAtTimestamp(now);
-		const targetNextEventTime = now + 20000;
-		testTimeOffsetMs += (currentWorld.endTime - targetNextEventTime);
-		if (window.Clock) {
-			window.Clock.setOffset(testTimeOffsetMs);
+		if (currentLayout === 'worldevents') {
+			const now = getAppTime();
+			const currentWorld = getWorldEventAtTimestamp(now);
+			const targetNextEventTime = now + 20000;
+			testTimeOffsetMs += (currentWorld.endTime - targetNextEventTime);
+			if (window.Clock) {
+				window.Clock.setOffset(testTimeOffsetMs);
+			}
+			const updatedNow = getAppTime();
+			const updatedWorld = getWorldEventAtTimestamp(updatedNow);
+			lastWorldSlotIndex = updatedWorld.slotIndex;
+			if (window.MusicPlayer) {
+				window.MusicPlayer.resetTransition();
+				window.MusicPlayer.lastWorldSlotIndex = updatedWorld.slotIndex;
+				window.MusicPlayer.sync(updatedNow, true);
+			}
+			render();
+		} else if (currentLayout === 'traanstock') {
+			if (window.TraanStockLayout && typeof window.TraanStockLayout.randomizeStock === 'function') {
+				window.TraanStockLayout.randomizeStock();
+			}
 		}
-		const updatedNow = getAppTime();
-		const updatedWorld = getWorldEventAtTimestamp(updatedNow);
-		lastWorldSlotIndex = updatedWorld.slotIndex;
-		if (window.MusicPlayer) {
-			window.MusicPlayer.resetTransition();
-			window.MusicPlayer.lastWorldSlotIndex = updatedWorld.slotIndex;
-			window.MusicPlayer.sync(updatedNow, true);
-		}
-		render();
 	});
 }
 
@@ -591,5 +639,6 @@ if (window.MusicPlayer) {
 switchLayout(currentLayout, true);
 updateReminderUI();
 updateSoundtrackUI();
+updateAnimationsUI();
 render();
 setInterval(render, 500);

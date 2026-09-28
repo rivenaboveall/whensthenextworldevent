@@ -42,7 +42,7 @@ const Database = {
     },
 
     async getTraanMetadata() {
-        return this.jsonGet('src/database/local/TraanItemMetadata.json', true);
+        return this.jsonGet('src/database/local/TraanThemeMetadata.json', true);
     },
 
     async getTraanAllItems() {

@@ -110,8 +110,48 @@
   border-color: rgba(200, 163, 85, 0.65);
 }
 
-.traan-item-card.has-wiki-link:hover .traan-item-name {
-  color: #dfb76c;
+.traan-item-card.traan-item-themed {
+  position: relative;
+  border-color: var(--traan-theme-border);
+  background: var(--traan-theme-bg);
+  box-shadow: var(--traan-theme-glow);
+}
+
+.traan-item-card.traan-item-themed .traan-item-icon-box {
+  border-color: var(--traan-theme-icon-border);
+  background: var(--traan-theme-icon-bg, rgba(22, 20, 18, 0.9));
+  box-shadow: var(--traan-theme-icon-glow);
+}
+
+.traan-item-card.traan-item-themed .traan-corner {
+  background: var(--traan-theme-corner);
+}
+
+.traan-item-card.traan-item-themed:hover {
+  border-color: var(--traan-theme-hover-border);
+  box-shadow: var(--traan-theme-hover-glow);
+}
+
+.traan-item-card.traan-item-themed.theme-secondary {
+  border-color: var(--traan-theme-sec-border) !important;
+  background: rgba(14, 16, 22, 0.68) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+.traan-item-card.traan-item-themed.theme-secondary .traan-item-icon-box {
+  border-color: var(--traan-theme-sec-icon-border) !important;
+  background: rgba(22, 20, 18, 0.9) !important;
+  box-shadow: none !important;
+}
+
+.traan-item-card.traan-item-themed.theme-secondary .traan-corner {
+  background: var(--traan-theme-sec-corner) !important;
+}
+
+.traan-item-card.traan-item-themed.theme-secondary:hover {
+  border-color: var(--traan-theme-sec-border) !important;
+  background: rgba(20, 22, 30, 0.8) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
 }
 
 .traan-item-left {
