@@ -74,11 +74,6 @@
 
       <div id="side-menu-dropdown" class="menu-dropdown layout-hidden" role="menu">
         <div id="menu-group-global" class="menu-group">
-          <button id="menu-item-mute-soundtrack" class="menu-item menu-item-soundtrack" type="button" role="menuitem"
-            data-hover-text="Globally mute the soundtrack that plays based on the current event's theme">
-            <span class="menu-item-text">Mute Soundtrack</span>
-            <span class="menu-soundtrack-status menu-item-status">Unmuted</span>
-          </button>
           <button id="menu-item-animations" class="menu-item" type="button" role="menuitem"
             data-hover-text="Globally disable background transitions, layout fades, and UI animations">
             <span class="menu-item-text">Disable Animations</span>
@@ -115,6 +110,14 @@
         </div>
 
         <div id="menu-group-dateseasons" class="menu-group layout-hidden"></div>
+
+        <div class="menu-separator" role="separator"></div>
+
+        <div class="menu-volume-group">
+          <label for="menu-volume-slider" class="menu-volume-label">Volume</label>
+          <input type="range" id="menu-volume-slider" class="menu-volume-slider" min="0" max="100" value="50"
+            data-hover-text="Soundtrack Volume: 50%" aria-label="Soundtrack Volume">
+        </div>
       </div>
     </div>
     <div class="top-bar-right">
@@ -257,9 +260,9 @@
   <script src="src/database/database.js?v=2"></script>
   <script src="pages/world-events/worldevents.js?v=11"></script>
   <script src="pages/traan-zakshun/traanstock.js?v=25"></script>
-  <script src="pages/date-seasons/dateseasons.js?v=16"></script>
-  <script src="src/musicplayer.js?v=20"></script>
-  <script src="src/main.js?v=23"></script>
+  <script src="pages/date-seasons/dateseasons.js?v=18"></script>
+  <script src="src/musicplayer.js?v=23"></script>
+  <script src="src/main.js?v=24"></script>
 </body>
 
 </html>

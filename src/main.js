@@ -9,8 +9,7 @@ const menuItemRemindWe = document.getElementById('menu-item-remind-we');
 const menuRemindWeStatus = document.getElementById('menu-remind-we-status');
 const menuItemAnimations = document.getElementById('menu-item-animations');
 const menuAnimationsStatus = document.getElementById('menu-animations-status');
-const soundtrackButtons = document.querySelectorAll('.menu-item-soundtrack');
-const soundtrackStatuses = document.querySelectorAll('.menu-soundtrack-status');
+const menuVolumeSlider = document.getElementById('menu-volume-slider');
 
 const eventTypeDropdown = document.getElementById('event-type-dropdown');
 const eventTypeBtn = document.getElementById('event-type-btn');
@@ -34,7 +33,19 @@ window.getAppTime = getAppTime;
 let isRemindWE = localStorage.getItem('user_remind_we') === 'true';
 window.isRemindWEEnabled = () => isRemindWE;
 let isRemindTraan = localStorage.getItem('user_remind_traan') === 'true';
-let isSoundtrackMuted = localStorage.getItem('user_soundtrack_muted') === 'true';
+function getStoredSoundtrackVolume() {
+	const saved = localStorage.getItem('user_soundtrack_volume');
+	if (saved !== null && saved !== '') {
+		const parsed = parseFloat(saved);
+		if (!isNaN(parsed)) {
+			const clamped = parsed > 1 ? parsed : parsed * 100;
+			return Math.max(0, Math.min(100, Math.round(clamped)));
+		}
+	}
+	return 50;
+}
+
+let soundtrackVolume = getStoredSoundtrackVolume();
 let isAnimationsDisabled = localStorage.getItem('user_disable_animations') === 'true';
 window.isAnimationsDisabled = () => isAnimationsDisabled;
 if (isAnimationsDisabled) {
@@ -96,12 +107,26 @@ function updateReminderUI() {
 	}
 }
 
-function updateSoundtrackUI() {
-	soundtrackStatuses.forEach((statusEl) => {
-		statusEl.textContent = isSoundtrackMuted ? 'Muted' : 'Unmuted';
-		statusEl.classList.toggle('status-muted', isSoundtrackMuted);
-		statusEl.classList.toggle('status-active', !isSoundtrackMuted);
-	});
+function updateVolumeSliderUI(val) {
+	if (!menuVolumeSlider) {
+		return;
+	}
+	menuVolumeSlider.value = String(val);
+	menuVolumeSlider.style.setProperty('--volume-percent', `${val}%`);
+	menuVolumeSlider.setAttribute('data-hover-text', `Soundtrack Volume: ${val}%`);
+	menuVolumeSlider.setAttribute('aria-valuenow', String(val));
+	if (cursorHoverBox && currentHoverTarget === menuVolumeSlider) {
+		cursorHoverBox.textContent = `Soundtrack Volume: ${val}%`;
+	}
+}
+
+function setSoundtrackVolume(val) {
+	soundtrackVolume = Math.max(0, Math.min(100, Math.round(val)));
+	localStorage.setItem('user_soundtrack_volume', String(soundtrackVolume));
+	updateVolumeSliderUI(soundtrackVolume);
+	if (window.MusicPlayer) {
+		window.MusicPlayer.setVolume(soundtrackVolume / 100);
+	}
 }
 
 function updateAnimationsUI() {
@@ -429,16 +454,15 @@ if (menuItemRemindWe) {
 	});
 }
 
-soundtrackButtons.forEach((btn) => {
-	btn.addEventListener('click', () => {
-		isSoundtrackMuted = !isSoundtrackMuted;
-		localStorage.setItem('user_soundtrack_muted', String(isSoundtrackMuted));
-		updateSoundtrackUI();
-		if (window.MusicPlayer) {
-			window.MusicPlayer.setMuted(isSoundtrackMuted);
-		}
+if (menuVolumeSlider) {
+	updateVolumeSliderUI(soundtrackVolume);
+	menuVolumeSlider.addEventListener('input', (e) => {
+		setSoundtrackVolume(Number(e.target.value));
 	});
-});
+	menuVolumeSlider.addEventListener('change', (e) => {
+		setSoundtrackVolume(Number(e.target.value));
+	});
+}
 
 if (menuItemAnimations) {
 	menuItemAnimations.addEventListener('click', () => {
@@ -618,6 +642,7 @@ const unlockAudio = () => {
 	window.removeEventListener('keydown', unlockAudio, { capture: true });
 	window.removeEventListener('touchstart', unlockAudio, { capture: true });
 };
+
 window.addEventListener('pointerdown', unlockAudio, { capture: true, once: true });
 window.addEventListener('click', unlockAudio, { capture: true, once: true });
 window.addEventListener('keydown', unlockAudio, { capture: true, once: true });
@@ -638,7 +663,10 @@ if (window.MusicPlayer) {
 
 switchLayout(currentLayout, true);
 updateReminderUI();
-updateSoundtrackUI();
+updateVolumeSliderUI(soundtrackVolume);
+if (window.MusicPlayer) {
+	window.MusicPlayer.setVolume(soundtrackVolume / 100);
+}
 updateAnimationsUI();
 render();
 setInterval(render, 500);

@@ -49,15 +49,6 @@ const Database = {
         return this.jsonGet('src/database/local/TraanAllItems.json', true);
     },
 
-    // DISASTERS AND WORLD EVENTS
-    async getDisasters() {
-        return this.jsonGet('src/database/local/Disasters.json', true);
-    },
-
-    async getWorldEvents() {
-        return this.jsonGet('src/database/local/WorldEvents.json', true);
-    },
-
     // REGULAR ASS CLOCK
     async getClockDayStages() {
         return this.jsonGet('src/database/local/ClockDayStages.json', true);

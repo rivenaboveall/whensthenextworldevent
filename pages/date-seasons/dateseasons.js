@@ -350,18 +350,10 @@ const DateSeasonsPage = {
 
     getAudioTrackInfo(now) {
         const cal = getCalendarStatus(now || ((typeof getAppTime === 'function') ? getAppTime() : Date.now()));
-        const season = cal && cal.currentMonth && cal.currentMonth.season ? cal.currentMonth.season : 'Autumn';
-        const seasonDurations = {
-            Spring: 145.728979,
-            Summer: 158.302042,
-            Autumn: 140.505215,
-            Winter: 192.446979
-        };
-        const duration = seasonDurations[season];
         return {
-            src: `assets/music/Seasons/${season}.mp3`,
-            duration: duration,
-            eventName: `${cal.currentMonth.name} (${season})`
+            src: 'assets/music/Seasonal.mp3',
+            duration: 166.582857,
+            eventName: `${cal.currentMonth.name} (${cal.currentMonth.season})`
         };
     },
 
@@ -374,15 +366,11 @@ const DateSeasonsPage = {
         const cal = getCalendarStatus(now);
 
         if (this.isMounted && this.currentSeason !== cal.currentMonth.season) {
-            const seasonChanged = this.currentSeason !== null;
             this.currentSeason = cal.currentMonth.season;
             const bgEl = document.getElementById('bg-image');
             if (bgEl) {
                 const bgUrl = SEASON_BACKGROUNDS[cal.currentMonth.season] || SEASON_BACKGROUNDS.Autumn;
                 bgEl.style.backgroundImage = `url("${bgUrl}")`;
-            }
-            if (seasonChanged && window.MusicPlayer && window.MusicPlayer.activeLayout === 'dateseasons') {
-                window.MusicPlayer.currentTrackSrc = '';
             }
         }
 

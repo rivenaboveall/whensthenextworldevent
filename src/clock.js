@@ -115,8 +115,41 @@ const WorldEventClock = {
     disasterIntervalMs: 60 * 60 * 1000,
     joinWindowMs: 5 * 60 * 1000,
 
-    worldEvents: window.Database.getWorldEvents(),
-    disasters: window.Database.getDisasters(),
+    worldEvents: [
+        {
+            "name": "Battle Royale",
+            "gradientClass": "gradient-battle-royale",
+            "textGlowClass": "text-glow-battle-royale",
+            "bgImage": "assets/images/BattleRoyale.webp"
+        },
+        {
+            "name": "Carnival of Hearts",
+            "gradientClass": "gradient-carnival",
+            "textGlowClass": "text-glow-carnival",
+            "bgImage": "assets/images/Carnival.webp"
+        },
+        {
+            "name": "Interluminary Interloper",
+            "gradientClass": "gradient-interluminary",
+            "textGlowClass": "text-glow-interluminary",
+            "bgImage": "assets/images/Parasol.webp"
+        }
+    ],
+
+    disasters: [
+        {
+            "name": "Cinders of Etris",
+            "gradientClass": "disaster-gradient-etris",
+            "textGlowClass": "text-glow-etris",
+            "bgImage": "assets/images/CindersOfEtris.webp"
+        },
+        {
+            "name": "Doom of Caeranthil",
+            "gradientClass": "disaster-gradient-caeranthil",
+            "textGlowClass": "text-glow-caeranthil",
+            "bgImage": "assets/images/Caeranthil.webp"
+        }
+    ],
 
     getWorldEventAtTimestamp(timestamp) {
         const diff = timestamp - this.worldAnchorTimestamp;

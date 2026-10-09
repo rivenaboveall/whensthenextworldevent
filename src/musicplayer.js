@@ -31,25 +31,10 @@ const TRACK_METADATA = {
         src: 'assets/music/Traan.mp3',
         duration: 150.952925
     },
-    'Spring': {
+    'Seasonal': {
         type: 'single',
-        src: 'assets/music/Seasons/Spring.mp3',
-        duration: 145.728979
-    },
-    'Summer': {
-        type: 'single',
-        src: 'assets/music/Seasons/Summer.mp3',
-        duration: 158.302042
-    },
-    'Autumn': {
-        type: 'single',
-        src: 'assets/music/Seasons/Autumn.mp3',
-        duration: 140.505215
-    },
-    'Winter': {
-        type: 'single',
-        src: 'assets/music/Seasons/Winter.mp3',
-        duration: 192.446979
+        src: 'assets/music/Seasonal.mp3',
+        duration: 166.582857
     }
 };
 
@@ -105,17 +90,38 @@ function detectInitialMusicLayout() {
     return 'worldevents';
 }
 
+function getInitialVolume() {
+    const saved = localStorage.getItem('user_soundtrack_volume');
+    if (saved !== null && saved !== '') {
+        const parsed = parseFloat(saved);
+        if (!isNaN(parsed)) {
+            const normalized = parsed > 1 ? parsed / 100 : parsed;
+            return Math.max(0, Math.min(1, normalized));
+        }
+    }
+    return 0.5;
+}
+
 const MusicPlayer = {
     audio: null,
     announcementAudio: null,
     currentTrackSrc: '',
-    isMuted: localStorage.getItem('user_soundtrack_muted') === 'true',
+    targetVolume: getInitialVolume(),
+    get isMuted() {
+        return this.targetVolume <= 0;
+    },
+    set isMuted(val) {
+        if (val) {
+            this.setVolume(0);
+        } else if (this.targetVolume <= 0) {
+            this.setVolume(0.5);
+        }
+    },
     activeLayout: detectInitialMusicLayout(),
     hasInteracted: false,
     transitionPhase: 'normal',
     lastWorldSlotIndex: null,
     fadedOutSlotIndex: null,
-    targetVolume: 1.0,
     _syncGen: 0,
     _initialized: false,
 
@@ -164,7 +170,7 @@ const MusicPlayer = {
         if (!this.announcementAudio) {
             this.announcementAudio = new Audio('assets/sounds/Announcement.mp3');
             this.announcementAudio.preload = 'auto';
-            this.announcementAudio.volume = 1.0;
+            this.announcementAudio.volume = this.targetVolume;
             this.announcementAudio.addEventListener('ended', () => {
                 this.handleAnnouncementEnded();
             });
@@ -281,28 +287,31 @@ const MusicPlayer = {
         }
     },
 
-    setMuted(muted) {
-        this.isMuted = muted;
-        if (this.isMuted) {
-            if (this.audio) {
-                fadeAudio(this.audio, 0, 800, () => {
-                    if (this.isMuted && this.audio) {
-                        this.audio.pause();
-                    }
-                });
+    setVolume(volume) {
+        const val = Math.max(0, Math.min(1, Number(volume)));
+        this.targetVolume = val;
+        if (this.announcementAudio) {
+            this.announcementAudio.volume = val;
+        }
+        if (this.audio) {
+            if (this.audio._fadeInterval) {
+                clearInterval(this.audio._fadeInterval);
+                this.audio._fadeInterval = null;
             }
-        } else {
-            if (this.audio) {
-                if (this.audio.paused) {
-                    this.audio.play().then(() => {
-                        this.hasInteracted = true;
-                        fadeAudio(this.audio, this.targetVolume, 1200);
-                    }).catch(() => { });
-                } else {
-                    fadeAudio(this.audio, this.targetVolume, 1200);
+            if (val <= 0) {
+                this.audio.volume = 0;
+                this.audio.pause();
+            } else {
+                this.audio.volume = val;
+                if (this.audio.paused && this.hasInteracted && this.transitionPhase === 'normal') {
+                    this.audio.play().catch(() => {});
                 }
             }
         }
+    },
+
+    setMuted(muted) {
+        this.isMuted = muted;
     },
 
     resetTransition() {
@@ -321,7 +330,7 @@ const MusicPlayer = {
         }
         this.announcementAudio.pause();
         this.announcementAudio.currentTime = 0;
-        this.announcementAudio.volume = 1.0;
+        this.announcementAudio.volume = this.targetVolume;
         if (onComplete) {
             const handleEnd = () => {
                 this.announcementAudio.removeEventListener('ended', handleEnd);
@@ -549,7 +558,7 @@ const MusicPlayer = {
                     audio._isStarting = false;
                 });
             } else if (!this.isMuted && !audio.paused && this.transitionPhase === 'normal') {
-                if (audio.volume < this.targetVolume && !audio._fadeInterval) {
+                if (Math.abs(audio.volume - this.targetVolume) > 0.05 && !audio._fadeInterval) {
                     fadeAudio(audio, this.targetVolume, 1000);
                 }
             }
